@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PNG Power Ltd - Digital Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --ppl-navy: #0B2B5B;
+      --ppl-blue: #004B87;
+      --ppl-gold: #FFC72C;
+      --ppl-red: #D71921;
+    }
+    body { background-color: #06152d; font-family: system-ui, -apple-system, sans-serif; color: #f1f5f9; }
+    .ppl-header { background: linear-gradient(135deg, #0B2B5B 0%, #001B3A 100%); border-bottom: 3px solid #FFC72C; }
+    .chat-bubble-bot { background-color: #0f2b48; border-top-left-radius: 0; border: 1px solid #1e4976; }
+    .chat-bubble-user { background-color: #004B87; border-top-right-radius: 0; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+  <!-- HEADER BRANDING -->
+  <header class="ppl-header text-white p-4 shadow-xl sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('dashboard')">
+        <svg class="w-10 h-10" viewBox="0 0 100 100" fill="none">
+          <ellipse cx="50" cy="50" rx="45" ry="32" fill="#0B2B5B" stroke="#ffffff" stroke-width="3"/>
+          <ellipse cx="50" cy="50" rx="20" ry="14" fill="#06152d"/>
+          <polygon points="62,10 42,48 55,48 35,90 52,55 40,55" fill="#FFC72C" stroke="#0B2B5B" stroke-width="2"/>
+        </svg>
+        <div>
+          <h1 class="text-xl font-black tracking-wider text-white">PNG POWER <span class="text-amber-400 text-sm font-bold">Ltd</span></h1>
+          <p class="text-xs text-slate-300">Customer Digital Portal & EasiPay Hub</p>
+        </div>
+      </div>
+      <!-- Desktop Nav -->
+      <nav class="hidden lg:flex items-center space-x-1 text-xs font-semibold">
+        <button onclick="switchTab('dashboard')" class="nav-btn px-3 py-2 rounded-lg bg-blue-900/60 text-white hover:bg-blue-800 transition">Dashboard</button>
+        <button onclick="switchTab('easipay')" class="nav-btn px-3 py-2 rounded-lg text-slate-300 hover:bg-blue-800/60 hover:text-white transition">EasiPay & USSD</button>
+        <button onclick="switchTab('grid')" class="nav-btn px-3 py-2 rounded-lg text-slate-300 hover:bg-blue-800/60 hover:text-white transition">Grid Info</button>
+        <button onclick="switchTab('news')" class="nav-btn px-3 py-2 rounded-lg text-slate-300 hover:bg-blue-800/60 hover:text-white transition">News & Notices</button>
+        <button onclick="switchTab('offices')" class="nav-btn px-3 py-2 rounded-lg text-slate-300 hover:bg-blue-800/60 hover:text-white transition">Office Finder</button>
+        <button onclick="switchTab('fraud')" class="nav-btn px-3 py-2 rounded-lg text-slate-300 hover:bg-blue-800/60 hover:text-white transition">Report Fraud</button>
+        <button onclick="switchTab('safety')" class="nav-btn px-3 py-2 rounded-lg text-slate-300 hover:bg-blue-800/60 hover:text-white transition">Safety & Outages</button>
+        <button onclick="switchTab('chat')" class="nav-btn px-3 py-2 rounded-lg text-amber-400 hover:bg-blue-800/60 transition">AI Assistant</button>
+      </nav>
+      <div class="flex items-center space-x-2">
+        <a href="tel:116" class="bg-red-600 hover:bg-red-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs flex items-center transition shadow">
+          <i class="fas fa-phone-alt mr-1"></i> Call 116
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- SUB-NAV BAR FOR MOBILE / TABLET -->
+  <div class="bg-slate-900 border-b border-slate-800 lg:hidden overflow-x-auto whitespace-nowrap p-2 shadow-inner">
+    <div class="max-w-7xl mx-auto flex space-x-2 text-xs font-semibold">
+      <button onclick="switchTab('dashboard')" class="mobile-nav-btn px-3 py-1.5 rounded bg-blue-900 text-white">Home</button>
+      <button onclick="switchTab('easipay')" class="mobile-nav-btn px-3 py-1.5 rounded bg-slate-800 text-slate-300">EasiPay</button>
+      <button onclick="switchTab('grid')" class="mobile-nav-btn px-3 py-1.5 rounded bg-slate-800 text-slate-300">Grid Info</button>
+      <button onclick="switchTab('news')" class="mobile-nav-btn px-3 py-1.5 rounded bg-slate-800 text-slate-300">News</button>
+      <button onclick="switchTab('offices')" class="mobile-nav-btn px-3 py-1.5 rounded bg-slate-800 text-slate-300">Offices</button>
+      <button onclick="switchTab('fraud')" class="mobile-nav-btn px-3 py-1.5 rounded bg-slate-800 text-slate-300">Fraud</button>
+      <button onclick="switchTab('safety')" class="mobile-nav-btn px-3 py-1.5 rounded bg-slate-800 text-slate-300">Safety</button>
+      <button onclick="switchTab('chat')" class="mobile-nav-btn px-3 py-1.5 rounded bg-slate-800 text-amber-400">Assistant</button>
+    </div>
+  </div>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto p-4 w-full flex-1 my-2">
+
+    <!-- 1. DASHBOARD VIEW -->
+    <div id="view-dashboard" class="tab-content active space-y-6">
+      <!-- Hero Banner -->
+      <div class="bg-gradient-to-r from-blue-950 via-slate-900 to-slate-950 border border-blue-900/60 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+        <div class="absolute right-0 top-0 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative z-10 max-w-2xl space-y-3">
+          <span class="bg-amber-500/20 text-amber-400 text-xs font-bold px-3 py-1 rounded-full border border-amber-500/30">Official Customer Portal</span>
+          <h2 class="text-2xl md:text-3xl font-black text-white tracking-tight">Reliable Energy & Services Across Papua New Guinea</h2>
+          <p class="text-xs md:text-sm text-slate-300 leading-relaxed">
+            Welcome to the centralized PNG Power Ltd digital portal. Buy EasiPay tokens instantly, inspect regional grid statuses, locate customer service centres, report outages, and submit confidential fraud reports securely.
+          </p>
+          <div class="flex flex-wrap gap-3 pt-2">
+            <button onclick="switchTab('easipay')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs transition shadow flex items-center">
+              <i class="fas fa-bolt mr-2"></i> Buy EasiPay Tokens
+            </button>
+            <button onclick="switchTab('safety')" class="bg-red-700 hover:bg-red-600 text-white font-bold px-4 py-2 rounded-xl text-xs transition shadow flex items-center">
+              <i class="fas fa-exclamation-triangle mr-2"></i> Report Outage / Hazard
+            </button>
+            <button onclick="switchTab('offices')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold px-4 py-2 rounded-xl text-xs border border-slate-700 transition flex items-center">
+              <i class="fas fa-map-marker-alt mr-2 text-amber-400"></i> Office Directory
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Access Cards Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div onclick="switchTab('easipay')" class="bg-slate-900 border border-slate-800 hover:border-amber-500/60 rounded-xl p-4 cursor-pointer transition shadow group">
+          <div class="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg mb-3 group-hover:scale-110 transition">
+            <i class="fas fa-mobile-alt"></i>
+          </div>
+          <h3 class="text-sm font-bold text-white mb-1">EasiPay & USSD Hub</h3>
+          <p class="text-xs text-slate-400">Instant codes for bmical (*775#), BSP (*131#), Digicel (*888#), and lost token retrieval (*776#).</p>
+        </div>
+
+        <div onclick="switchTab('grid')" class="bg-slate-900 border border-slate-800 hover:border-blue-500/60 rounded-xl p-4 cursor-pointer transition shadow group">
+          <div class="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center text-lg mb-3 group-hover:scale-110 transition">
+            <i class="fas fa-network-wired"></i>
+          </div>
+          <h3 class="text-sm font-bold text-white mb-1">Regional Grids</h3>
+          <p class="text-xs text-slate-400">Live operational status of Port Moresby, Ramu, Gazelle grids, hydro dams, and generation mix.</p>
+        </div>
+
+        <div onclick="switchTab('news')" class="bg-slate-900 border border-slate-800 hover:border-emerald-500/60 rounded-xl p-4 cursor-pointer transition shadow group">
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg mb-3 group-hover:scale-110 transition">
+            <i class="fas fa-bullhorn"></i>
+          </div>
+          <h3 class="text-sm font-bold text-white mb-1">News & Notices</h3>
+          <p class="text-xs text-slate-400">Planned maintenance advisories, tariff updates, public notices, and corporate press releases.</p>
+        </div>
+
+        <div onclick="switchTab('fraud')" class="bg-slate-900 border border-slate-800 hover:border-red-500/60 rounded-xl p-4 cursor-pointer transition shadow group">
+          <div class="w-10 h-10 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center text-lg mb-3 group-hover:scale-110 transition">
+            <i class="fas fa-user-secret"></i>
+          </div>
+          <h3 class="text-sm font-bold text-white mb-1">Report Theft & Fraud</h3>
+          <p class="text-xs text-slate-400">Confidential reporting channel for meter tampering, illegal wire tapping, and bridging.</p>
+        </div>
+      </div>
+
+      <!-- Secondary Dashboard Section: Notices Preview & Emergency Hotline -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-md">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-sm font-bold text-white flex items-center">
+              <i class="fas fa-bell text-amber-400 mr-2"></i> Recent Public Notices & Outage Advisories
+            </h3>
+            <button onclick="switchTab('news')" class="text-xs text-blue-400 hover:underline">View All &rarr;</button>
+          </div>
+          <div class="space-y-3 text-xs">
+            <div onclick="switchTab('news')" class="bg-slate-950/70 p-3 rounded-lg border border-slate-800 hover:border-slate-700 cursor-pointer transition">
+              <div class="flex justify-between items-center mb-1">
+                <span class="bg-blue-900/50 text-blue-300 px-2 py-0.5 rounded text-[10px] font-semibold">Planned Outage</span>
+                <span class="text-slate-400 text-[10px]">November 15, 2026</span>
+              </div>
+              <h4 class="font-bold text-slate-200">Port Moresby Grid Upgrade: 11kV Feeder Maintenance in Hohola & Gordon</h4>
+              <p class="text-slate-400 mt-1 line-clamp-2">Routine maintenance works on the Hohola substation transformer bank will cause brief scheduled supply interruptions between 09:00 AM and 02:00 PM...</p>
+            </div>
+            <div onclick="switchTab('news')" class="bg-slate-950/70 p-3 rounded-lg border border-slate-800 hover:border-slate-700 cursor-pointer transition">
+              <div class="flex justify-between items-center mb-1">
+                <span class="bg-amber-900/50 text-amber-300 px-2 py-0.5 rounded text-[10px] font-semibold">Safety Notice</span>
+                <span class="text-slate-400 text-[10px]">November 12, 2026</span>
+              </div>
+              <h4 class="font-bold text-slate-200">Campaign Against EasiPay Meter Tampering & Illegal Hook-ups</h4>
+              <p class="text-slate-400 mt-1 line-clamp-2">PNG Power compliance teams and police taskforce launch nationwide inspections targeting meter bypassing and unmetered commercial connections...</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-red-950/80 via-slate-900 to-slate-900 border border-red-900/50 rounded-xl p-5 shadow-md flex flex-col justify-between">
+          <div>
+            <div class="flex items-center space-x-2 text-red-400 font-bold text-sm mb-2">
+              <i class="fas fa-headset"></i>
+              <span>24/7 National Emergency Hotline</span>
+            </div>
+            <p class="text-xs text-slate-300 mb-4">
+              Encountering a downed powerline, transformer spark, or severe outage? Call our 24/7 toll-free dispatch center immediately.
+            </p>
+            <div class="bg-slate-950 p-4 rounded-xl border border-red-900/40 text-center mb-4">
+              <span class="text-3xl font-black text-white tracking-wider">116</span>
+              <p class="text-[11px] text-red-300 mt-1">Toll-Free Nationwide (All Digicel & bmobile lines)</p>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <a href="tel:116" class="block w-full text-center bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-lg text-xs transition shadow">
+              Call 116 Now
+            </a>
+            <button onclick="switchTab('safety')" class="block w-full text-center bg-slate-800 hover:bg-slate-700 text-slate-300 py-2 rounded-lg text-xs border border-slate-700 transition">
+              Generate Fault Ticket (PPL-FLT)
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. EASIPAY & USSD VIEW -->
+    <div id="view-easipay" class="tab-content space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+          <div>
+            <h2 class="text-lg font-bold text-amber-400 flex items-center">
+              <i class="fas fa-mobile-alt mr-2 text-blue-400"></i> EasiPay Prepaid & USSD Buying Guide
+            </h2>
+            <p class="text-xs text-slate-400">Instantly top up your electricity meter using authorized banking partners and USSD shortcodes across PNG.</p>
+          </div>
+          <button onclick="switchTab('dashboard')" class="text-xs text-slate-400 hover:text-white bg-slate-800 px-3 py-1.5 rounded-lg">Back to Home</button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800">
+            <div class="flex justify-between items-center font-bold text-white mb-2">
+              <span class="text-red-400 font-mono text-sm">*775# - bmobile / Telikom</span>
+              <span class="text-slate-400 text-[10px]">Min: K15 | Max: K50</span>
+            </div>
+            <p class="text-xs text-slate-300 mb-3">Dial <strong>*775#</strong> on your bmobile/Telikom handset, enter your 11-digit meter number, specify the amount, and confirm.</p>
+            <div class="bg-amber-950/50 p-2.5 rounded-lg border border-amber-600/30 text-xs text-amber-300">
+              <strong>Missing SMS Token?</strong> Dial <strong class="text-amber-400">*776#</strong> and enter your meter number to retrieve your last token directly on your phone screen.
+            </div>
+          </div>
+
+          <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800">
+            <div class="flex justify-between items-center font-bold text-white mb-2">
+              <span class="text-emerald-400 font-mono text-sm">*131# - BSP Mobile Banking</span>
+              <span class="text-slate-400 text-[10px]">Instant SMS</span>
+            </div>
+            <p class="text-xs text-slate-300 mb-3">Dial <strong>*131#</strong>, enter your 4-digit PIN, select <em>TopUp Services</em>, then select <em>Easipay</em>. Enter your account, meter number, and amount.</p>
+          </div>
+
+          <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800">
+            <div class="flex justify-between items-center font-bold text-white mb-2">
+              <span class="text-rose-400 font-mono text-sm">*888# - Digicel Cellmoni</span>
+              <span class="text-slate-400 text-[10px]">Zero Service Fee</span>
+            </div>
+            <p class="text-xs text-slate-300 mb-3">Dial <strong>*888#</strong>, select Option 2 (Top-up Services) &rarr; Option 2 (Easipay). Enter meter number, amount (min K15), and wallet PIN.</p>
+          </div>
+        </div>
+
+        <!-- Meter LED Simulator & Keypad Codes -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+            <h3 class="text-sm font-bold text-white flex items-center">
+              <i class="fas fa-lightbulb text-amber-400 mr-2"></i> EasiPay Meter Indicator Light Guide
+            </h3>
+            <div class="space-y-2 text-xs">
+              <div class="flex items-center space-x-3 bg-slate-900 p-2.5 rounded-lg">
+                <span class="w-3.5 h-3.5 rounded-full bg-emerald-500 shadow-md shadow-emerald-500/50 shrink-0"></span>
+                <div>
+                  <strong class="text-white">Green Light:</strong> <span class="text-slate-300">Sufficient credit available on meter. Normal consumption.</span>
+                </div>
+              </div>
+              <div class="flex items-center space-x-3 bg-slate-900 p-2.5 rounded-lg">
+                <span class="w-3.5 h-3.5 rounded-full bg-amber-400 shadow-md shadow-amber-400/50 shrink-0"></span>
+                <div>
+                  <strong class="text-white">Amber Light:</strong> <span class="text-slate-300">Approximately 1 week of power remaining. Plan your top-up.</span>
+                </div>
+              </div>
+              <div class="flex items-center space-x-3 bg-slate-900 p-2.5 rounded-lg">
+                <span class="w-3.5 h-3.5 rounded-full bg-red-500 animate-pulse shadow-md shadow-red-500/50 shrink-0"></span>
+                <div>
+                  <strong class="text-white">Red Light (Flashing):</strong> <span class="text-slate-300">Critical low credit (~3 days remaining). Purchase units immediately.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+            <h3 class="text-sm font-bold text-white flex items-center">
+              <i class="fas fa-keyboard text-blue-400 mr-2"></i> Common Meter Keypad Shortcuts
+            </h3>
+            <div class="space-y-2 text-xs text-slate-300">
+              <div class="bg-slate-900 p-2 rounded flex justify-between">
+                <span>Display current credit balance in kWh:</span>
+                <strong class="text-amber-400 font-mono">000 [ENTER]</strong>
+              </div>
+              <div class="bg-slate-900 p-2 rounded flex justify-between">
+                <span>Display total cumulative kWh used:</span>
+                <strong class="text-amber-400 font-mono">001 [ENTER]</strong>
+              </div>
+              <div class="bg-slate-900 p-2 rounded flex justify-between">
+                <span>Test relay / disconnect switch status:</span>
+                <strong class="text-amber-400 font-mono">007 [ENTER]</strong>
+              </div>
+              <div class="bg-slate-900 p-2 rounded flex justify-between">
+                <span>Error 30 / Token Rejected fix:</span>
+                <strong class="text-red-400 font-mono">Re-enter 20 digits</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. GRID INFO VIEW -->
+    <div id="view-grid" class="tab-content space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+          <div>
+            <h2 class="text-lg font-bold text-blue-400 flex items-center">
+              <i class="fas fa-network-wired mr-2"></i> Regional Grid Information & Power Systems
+            </h2>
+            <p class="text-xs text-slate-400">Live operational oversight of Papua New Guinea's major electricity grids and generation assets.</p>
+          </div>
+          <button onclick="switchTab('dashboard')" class="text-xs text-slate-400 hover:text-white bg-slate-800 px-3 py-1.5 rounded-lg">Back to Home</button>
+        </div>
+
+        <!-- Grid Selector Tabs -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <div onclick="selectGrid('pom')" id="grid-tab-pom" class="bg-blue-950 border-2 border-blue-500 p-4 rounded-xl cursor-pointer transition shadow">
+            <div class="flex justify-between items-center mb-1">
+              <h3 class="text-sm font-bold text-white">Port Moresby Grid</h3>
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            </div>
+            <p class="text-xs text-slate-300">Capacity: ~200+ MW | Base: Rouna Hydro Cascade, Sirinumu, NiuPower (LNG) & Dirio IPP.</p>
+          </div>
+
+          <div onclick="selectGrid('ramu')" id="grid-tab-ramu" class="bg-slate-950 border border-slate-800 hover:border-slate-700 p-4 rounded-xl cursor-pointer transition shadow">
+            <div class="flex justify-between items-center mb-1">
+              <h3 class="text-sm font-bold text-white">Ramu Grid System</h3>
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            </div>
+            <p class="text-xs text-slate-300">Capacity: ~100+ MW | Base: Yonki Dam, Ramu 1 Hydro & 132kV Momase-Highlands transmission.</p>
+          </div>
+
+          <div onclick="selectGrid('gazelle')" id="grid-tab-gazelle" class="bg-slate-950 border border-slate-800 hover:border-slate-700 p-4 rounded-xl cursor-pointer transition shadow">
+            <div class="flex justify-between items-center mb-1">
+              <h3 class="text-sm font-bold text-white">Gazelle Grid (ENBP)</h3>
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            </div>
+            <p class="text-xs text-slate-300">Capacity: ~25 MW | Base: Warangoi Hydro & Ulagunan thermal power station.</p>
+          </div>
+        </div>
+
+        <!-- Grid Detail Content Box -->
+        <div id="grid-detail-content" class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-4 text-xs">
+          <!-- Default loaded: Port Moresby -->
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-800 pb-3 gap-2">
+            <div>
+              <h4 class="text-sm font-bold text-white text-base">Port Moresby Interconnected System (POMIS)</h4>
+              <p class="text-slate-400">Supplying National Capital District, Central Province, LNG plant, and industrial corridors.</p>
+            </div>
+            <span class="bg-emerald-950 text-emerald-400 border border-emerald-600/40 px-3 py-1 rounded-full font-bold">System Status: Stable (Normal Load)</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-slate-900 p-3 rounded-lg border border-slate-800">
+              <span class="text-slate-400 block mb-1">Primary Generation Stations</span>
+              <strong class="text-white">Rouna 1, 2, 3 & 4 Hydro, Sirinumu Dam, NiuPower (LNG) & Dirio Gas Power.</strong>
+            </div>
+            <div class="bg-slate-900 p-3 rounded-lg border border-slate-800">
+              <span class="text-slate-400 block mb-1">Transmission Voltages</span>
+              <strong class="text-amber-400">66kV & 33kV Transmission Ring; 11kV Distribution Feeders.</strong>
+            </div>
+            <div class="bg-slate-900 p-3 rounded-lg border border-slate-800">
+              <span class="text-slate-400 block mb-1">Electrical Standards</span>
+              <strong class="text-blue-400">240V / 415V (Single / Three Phase), 50Hz AC.</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. NEWS & NOTICES VIEW -->
+    <div id="view-news" class="tab-content space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+          <div>
+            <h2 class="text-lg font-bold text-emerald-400 flex items-center">
+              <i class="fas fa-bullhorn mr-2"></i> News & Public Notices
+            </h2>
+            <p class="text-xs text-slate-400">Stay informed with official planned outage schedules, safety announcements, and tariff publications.</p>
+          </div>
+          <button onclick="switchTab('dashboard')" class="text-xs text-slate-400 hover:text-white bg-slate-800 px-3 py-1.5 rounded-lg">Back to Home</button>
+        </div>
+
+        <!-- Filter Buttons -->
+        <div class="flex flex-wrap gap-2 mb-4 text-xs">
+          <button onclick="filterNotices('all')" id="notice-filter-all" class="bg-emerald-600 text-white font-semibold px-3 py-1.5 rounded-lg transition">All Notices</button>
+          <button onclick="filterNotices('outage')" id="notice-filter-outage" class="bg-slate-800 text-slate-300 hover:bg-slate-700 px-3 py-1.5 rounded-lg transition">Planned Outages</button>
+          <button onclick="filterNotices('safety')" id="notice-filter-safety" class="bg-slate-800 text-slate-300 hover:bg-slate-700 px-3 py-1.5 rounded-lg transition">Safety & Compliance</button>
+          <button onclick="filterNotices('corporate')" id="notice-filter-corporate" class="bg-slate-800 text-slate-300 hover:bg-slate-700 px-3 py-1.5 rounded-lg transition">Corporate News</button>
+        </div>
+
+        <!-- Notices List -->
+        <div class="space-y-3 text-xs" id="notices-container">
+          <div class="notice-item bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2" data-category="outage">
+            <div class="flex justify-between items-center">
+              <span class="bg-blue-900/60 text-blue-300 px-2.5 py-0.5 rounded font-semibold">Planned Outage &bull; Port Moresby</span>
+              <span class="text-slate-400 text-[11px]">Date: November 15, 2026</span>
+            </div>
+            <h3 class="text-sm font-bold text-white">Hohola, 6-Mile and Gordon Substation 11kV Feeder Maintenance</h3>
+            <p class="text-slate-300">
+              PNG Power maintenance crews will conduct scheduled hardware replacements on the Hohola 11kV feeder line. Power supply will be temporarily interrupted from <strong>09:00 AM to 02:00 PM</strong> to allow safe replacement of porcelain insulators and transformer oil sampling.
+            </p>
+            <div class="flex justify-end pt-1">
+              <button onclick="openNoticeModal('Hohola, 6-Mile and Gordon Substation 11kV Feeder Maintenance', 'November 15, 2026', 'Port Moresby', 'PNG Power maintenance crews will conduct scheduled hardware replacements on the Hohola 11kV feeder line. Power supply will be temporarily interrupted from 09:00 AM to 02:00 PM to allow safe replacement of porcelain insulators and transformer oil sampling. Customers are advised to unplug sensitive electronic appliances prior to outage windows.')" class="text-xs text-amber-400 hover:underline font-semibold">Read Full Notice &rarr;</button>
+            </div>
+          </div>
+
+          <div class="notice-item bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2" data-category="safety">
+            <div class="flex justify-between items-center">
+              <span class="bg-amber-900/60 text-amber-300 px-2.5 py-0.5 rounded font-semibold">Safety &bull; Nationwide</span>
+              <span class="text-slate-400 text-[11px]">Date: November 12, 2026</span>
+            </div>
+            <h3 class="text-sm font-bold text-white">National Campaign Against EasiPay Meter Tampering & Power Theft</h3>
+            <p class="text-slate-300">
+              PNG Power reminds all residential and commercial customers that meter tampering, bridging, and unauthorized wire tappings are illegal under the Electricity Industry Act. Joint operations with police taskforces are active across Lae, Port Moresby, and Mt. Hagen.
+            </p>
+            <div class="flex justify-end pt-1">
+              <button onclick="openNoticeModal('National Campaign Against EasiPay Meter Tampering & Power Theft', 'November 12, 2026', 'Nationwide', 'PNG Power reminds all residential and commercial customers that meter tampering, bridging, and unauthorized wire tappings are illegal under the Electricity Industry Act. Joint operations with police taskforces are active across Lae, Port Moresby, and Mt. Hagen. Report suspicious hook-ups confidentially via 116.')" class="text-xs text-amber-400 hover:underline font-semibold">Read Full Notice &rarr;</button>
+            </div>
+          </div>
+
+          <div class="notice-item bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2" data-category="corporate">
+            <div class="flex justify-between items-center">
+              <span class="bg-emerald-900/60 text-emerald-300 px-2.5 py-0.5 rounded font-semibold">Corporate &bull; Kokopo</span>
+              <span class="text-slate-400 text-[11px]">Date: November 05, 2026</span>
+            </div>
+            <h3 class="text-sm font-bold text-white">Gazelle Grid Solar-Diesel Hybrid Integration Project Nears Completion</h3>
+            <p class="text-slate-300">
+              The renewable energy integration project in East New Britain is in its final testing phase, set to add 5MW of solar PV generation to stabilize the Gazelle grid network and reduce thermal diesel reliance.
+            </p>
+            <div class="flex justify-end pt-1">
+              <button onclick="openNoticeModal('Gazelle Grid Solar-Diesel Hybrid Integration Project Nears Completion', 'November 05, 2026', 'Kokopo', 'The renewable energy integration project in East New Britain is in its final testing phase, set to add 5MW of solar PV generation to stabilize the Gazelle grid network and reduce thermal diesel reliance.')" class="text-xs text-amber-400 hover:underline font-semibold">Read Full Notice &rarr;</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. OFFICE FINDER VIEW -->
+    <div id="view-offices" class="tab-content space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+          <div>
+            <h2 class="text-lg font-bold text-amber-400 flex items-center">
+              <i class="fas fa-map-marker-alt mr-2"></i> Customer Service Centre Directory
+            </h2>
+            <p class="text-xs text-slate-400">Find PNG Power customer service offices, EasiPay token vending desks, and bill payment counters across PNG.</p>
+          </div>
+          <button onclick="switchTab('dashboard')" class="text-xs text-slate-400 hover:text-white bg-slate-800 px-3 py-1.5 rounded-lg">Back to Home</button>
+        </div>
+
+        <!-- Search Input -->
+        <div class="mb-4">
+          <input type="text" id="officeSearch" onkeyup="filterOffices()" placeholder="Search by city, centre name, or province (e.g., Boroko, Lae, Mt. Hagen)..." class="w-full bg-slate-950 border border-slate-800 text-white rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-blue-500" />
+        </div>
+
+        <!-- Offices Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs" id="offices-grid">
+          <div class="office-card bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+            <div class="flex justify-between items-center font-bold text-white">
+              <span class="text-amber-400">Boroko Customer Service Centre</span>
+              <span class="bg-blue-900/50 text-blue-300 px-2 py-0.5 rounded text-[10px]">NCD</span>
+            </div>
+            <p class="text-slate-300"><i class="fas fa-map-pin mr-1 text-red-400"></i> Taurama Road, Boroko, Port Moresby</p>
+            <p class="text-slate-400"><i class="fas fa-clock mr-1 text-slate-500"></i> Mon - Fri: 8:00 AM - 4:00 PM</p>
+            <p class="text-slate-300"><strong>Services:</strong> EasiPay token sales, new meter connections, bill inquiries, dispute resolution.</p>
+          </div>
+
+          <div class="office-card bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+            <div class="flex justify-between items-center font-bold text-white">
+              <span class="text-amber-400">Hohola National Head Office</span>
+              <span class="bg-blue-900/50 text-blue-300 px-2 py-0.5 rounded text-[10px]">NCD</span>
+            </div>
+            <p class="text-slate-300"><i class="fas fa-map-pin mr-1 text-red-400"></i> Corner Wards Road & Hohola, Port Moresby</p>
+            <p class="text-slate-400"><i class="fas fa-clock mr-1 text-slate-500"></i> Mon - Fri: 8:00 AM - 4:30 PM</p>
+            <p class="text-slate-300"><strong>Services:</strong> Corporate HQ, billing escalations, commercial accounts, safety reporting.</p>
+          </div>
+
+          <div class="office-card bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+            <div class="flex justify-between items-center font-bold text-white">
+              <span class="text-amber-400">Lae City Customer Centre</span>
+              <span class="bg-emerald-900/50 text-emerald-300 px-2 py-0.5 rounded text-[10px]">Morobe</span>
+            </div>
+            <p class="text-slate-300"><i class="fas fa-map-pin mr-1 text-red-400"></i> Coronation Drive, Top Town, Lae</p>
+            <p class="text-slate-400"><i class="fas fa-clock mr-1 text-slate-500"></i> Mon - Fri: 8:00 AM - 4:00 PM</p>
+            <p class="text-slate-300"><strong>Services:</strong> Ramu grid customer support, EasiPay vending, fault reporting.</p>
+          </div>
+
+          <div class="office-card bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+            <div class="flex justify-between items-center font-bold text-white">
+              <span class="text-amber-400">Mt. Hagen Regional Office</span>
+              <span class="bg-purple-900/50 text-purple-300 px-2 py-0.5 rounded text-[10px]">Western Highlands</span>
+            </div>
+            <p class="text-slate-300"><i class="fas fa-map-pin mr-1 text-red-400"></i> Hagen Drive, Mt. Hagen Town</p>
+            <p class="text-slate-400"><i class="fas fa-clock mr-1 text-slate-500"></i> Mon - Fri: 8:00 AM - 4:00 PM</p>
+            <p class="text-slate-300"><strong>Services:</strong> Highlands regional grid support, EasiPay sales, meter testing.</p>
+          </div>
+
+          <div class="office-card bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+            <div class="flex justify-between items-center font-bold text-white">
+              <span class="text-amber-400">Kokopo Customer Service Desk</span>
+              <span class="bg-amber-900/50 text-amber-300 px-2 py-0.5 rounded text-[10px]">ENBP</span>
+            </div>
+            <p class="text-slate-300"><i class="fas fa-map-pin mr-1 text-red-400"></i> Mango Avenue, Kokopo Town</p>
+            <p class="text-slate-400"><i class="fas fa-clock mr-1 text-slate-500"></i> Mon - Fri: 8:00 AM - 4:00 PM</p>
+            <p class="text-slate-300"><strong>Services:</strong> Gazelle grid accounts, EasiPay top-ups, outage inquiries.</p>
+          </div>
+
+          <div class="office-card bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+            <div class="flex justify-between items-center font-bold text-white">
+              <span class="text-amber-400">Madang Provincial Office</span>
+              <span class="bg-teal-900/50 text-teal-300 px-2 py-0.5 rounded text-[10px]">Madang</span>
+            </div>
+            <p class="text-slate-300"><i class="fas fa-map-pin mr-1 text-red-400"></i> Coastwatchers Avenue, Madang</p>
+            <p class="text-slate-400"><i class="fas fa-clock mr-1 text-slate-500"></i> Mon - Fri: 8:00 AM - 4:00 PM</p>
+            <p class="text-slate-300"><strong>Services:</strong> Momase regional power services, EasiPay sales, bill payments.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. REPORT FRAUD VIEW -->
+    <div id="view-fraud" class="tab-content space-y-6">
+      <div class="bg-slate-900 border border-red-900/60 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+        <div class="absolute top-0 right-0 bg-red-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl">STRICTLY CONFIDENTIAL</div>
+        
+        <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+          <div>
+            <h2 class="text-lg font-bold text-red-400 flex items-center">
+              <i class="fas fa-user-secret mr-2"></i> Confidential Power Theft & Fraud Reporting
+            </h2>
+            <p class="text-xs text-slate-300">Help protect community safety, prevent electrical fires, and ensure grid reliability by reporting illegal connections.</p>
+          </div>
+          <button onclick="switchTab('dashboard')" class="text-xs text-slate-400 hover:text-white bg-slate-800 px-3 py-1.5 rounded-lg">Back to Home</button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Info box -->
+          <div class="space-y-4 text-xs">
+            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+              <h3 class="font-bold text-white text-sm">Qualifying Offences Include:</h3>
+              <ul class="list-disc list-inside text-slate-300 space-y-1.5">
+                <li>EasiPay meter tampering, broken security seals, or cracked casings.</li>
+                <li>Unauthorised direct overhead wire tappings ("illegal hook-ups").</li>
+                <li>Meter bridging or internal bypass cables.</li>
+                <li>Commercial operations running on residential tariffs.</li>
+              </ul>
+            </div>
+
+            <div class="bg-red-950/40 p-4 rounded-xl border border-red-900/50 space-y-2 text-red-200">
+              <h3 class="font-bold text-white text-sm"><i class="fas fa-shield-alt mr-1"></i> Whistleblower Protection</h3>
+              <p>All reports submitted through this portal or via hotline <strong>116</strong> are handled with strict confidentiality. Informant identities are fully protected under PPL compliance guidelines.</p>
+            </div>
+          </div>
+
+          <!-- Reporting Form -->
+          <div class="lg:col-span-2 bg-slate-950 p-5 rounded-xl border border-slate-800">
+            <form onsubmit="submitFraudReport(event)" class="space-y-4 text-xs">
+              <h3 class="font-bold text-white text-sm mb-2">Submit Incident Details</h3>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-slate-400 mb-1">Offence Type *</label>
+                  <select id="fraudType" class="w-full bg-slate-900 border border-slate-700 text-white rounded-lg p-2.5 focus:outline-none focus:border-red-500" required>
+                    <option value="">Select Offence Category</option>
+                    <option value="Meter Tampering">Meter Tampering / Broken Seals</option>
+                    <option value="Illegal Hook-up">Unauthorised Wire Hook-up / Tapping</option>
+                    <option value="Meter Bridging">Meter Bridging / Bypassing</option>
+                    <option value="Commercial Theft">Commercial Power Theft</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-slate-400 mb-1">Province / Region *</label>
+                  <select id="fraudProvince" class="w-full bg-slate-900 border border-slate-700 text-white rounded-lg p-2.5 focus:outline-none focus:border-red-500" required>
+                    <option value="">Select Province</option>
+                    <option value="NCD">National Capital District (Port Moresby)</option>
+                    <option value="Morobe">Morobe (Lae)</option>
+                    <option value="Western Highlands">Western Highlands (Mt. Hagen)</option>
+                    <option value="East New Britain">East New Britain (Kokopo)</option>
+                    <option value="Madang">Madang</option>
+                    <option value="Other">Other Province</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-slate-400 mb-1">Specific Location / Street Address / Landmark *</label>
+                <input type="text" id="fraudLocation" placeholder="e.g., Hohola Stage 3, near secondary school gate..." class="w-full bg-slate-900 border border-slate-700 text-white rounded-lg p-2.5 focus:outline-none focus:border-red-500" required />
+              </div>
+
+              <div>
+                <label class="block text-slate-400 mb-1">Incident Description & Suspect Details (Optional)</label>
+                <textarea id="fraudDesc" rows="3" placeholder="Provide details regarding meter number (if known), time of illegal activities, or descriptions..." class="w-full bg-slate-900 border border-slate-700 text-white rounded-lg p-2.5 focus:outline-none focus:border-red-500"></textarea>
+              </div>
+
+              <div class="flex items-center space-x-2">
+                <input type="checkbox" id="confirmsAnonymous" class="rounded bg-slate-900 border-slate-700 text-red-600" required />
+                <label for="confirmsAnonymous" class="text-slate-300">I confirm this report is submitted in good faith for community safety.</label>
+              </div>
+
+              <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg transition shadow">
+                Submit Confidential Report
+              </button>
+            </form>
+            <div id="fraudSuccessMsg" class="hidden mt-4 p-4 bg-emerald-950/80 border border-emerald-600/50 rounded-lg text-emerald-200 text-xs">
+              <strong>Report Successfully Logged!</strong> Thank you for protecting our national power grid. Reference Ticket: <span id="fraudTicketId" class="font-mono text-amber-400 font-bold"></span>. Our compliance team has been notified.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. SAFETY & OUTAGES VIEW -->
+    <div id="view-safety" class="tab-content space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+          <div>
+            <h2 class="text-lg font-bold text-amber-400 flex items-center">
+              <i class="fas fa-exclamation-triangle mr-2"></i> Safety Hazards & Outage Ticket Dispatch
+            </h2>
+            <p class="text-xs text-slate-400">Report fallen powerlines, transformer sparks, or generate formal fault dispatch tickets.</p>
+          </div>
+          <button onclick="switchTab('dashboard')" class="text-xs text-slate-400 hover:text-white bg-slate-800 px-3 py-1.5 rounded-lg">Back to Home</button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Safety Protocol -->
+          <div class="bg-red-950/30 border border-red-900/50 p-5 rounded-xl space-y-3 text-xs">
+            <h3 class="text-sm font-bold text-red-400 flex items-center">
+              <i class="fas fa-bolt mr-2 text-amber-400"></i> Fallen Powerline Emergency Protocol
+            </h3>
+            <ol class="list-decimal list-inside space-y-2 text-slate-300">
+              <li><strong>Stay at least 10 meters away</strong> from any fallen powerline, downed cable, or sparking transformer.</li>
+              <li>Assume <strong>all</strong> wires are live and carrying lethal voltage.</li>
+              <li>Keep children, pets, and bystanders completely away from the hazard zone.</li>
+              <li>Note the nearest <strong>Pole Identification Stencil Number</strong> (e.g., <em>POM-A12-04</em>).</li>
+              <li>Call PNG Power 24/7 emergency dispatch immediately on <strong>116</strong>.</li>
+            </ol>
+            <div class="pt-2">
+              <a href="tel:116" class="inline-block bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-lg transition shadow">
+                <i class="fas fa-phone-alt mr-1"></i> Call 116 Emergency Line
+              </a>
+            </div>
+          </div>
+
+          <!-- Fault Ticket Generator Form -->
+          <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
+            <form onsubmit="submitFaultTicket(event)" class="space-y-3 text-xs">
+              <h3 class="text-sm font-bold text-white mb-2">Generate Outage / Fault Dispatch Ticket</h3>
+              
+              <div>
+                <label class="block text-slate-400 mb-1">Issue Type *</label>
+                <select id="faultType" class="w-full bg-slate-900 border border-slate-700 text-white rounded-lg p-2.5 focus:outline-none focus:border-blue-500" required>
+                  <option value="">Select Fault Category</option>
+                  <option value="Fallen Powerline">Fallen Powerline / Hazard</option>
+                  <option value="Complete Blackout">Complete Neighborhood Blackout</option>
+                  <option value="Transformer Spark">Transformer Spark / Smoke</option>
+                  <option value="Low Voltage / Fluctuating">Low Voltage / Fluctuating Power</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-slate-400 mb-1">Location / Suburb / Landmark *</label>
+                <input type="text" id="faultLocation" placeholder="e.g., 4-Mile, near Ela Motors..." class="w-full bg-slate-900 border border-slate-700 text-white rounded-lg p-2.5 focus:outline-none focus:border-blue-500" required />
+              </div>
+
+              <div>
+                <label class="block text-slate-400 mb-1">Pole Stencil Number (If visible)</label>
+                <input type="text" id="faultPole" placeholder="e.g., POM-C4-12" class="w-full bg-slate-900 border border-slate-700 text-white rounded-lg p-2.5 focus:outline-none focus:border-blue-500" />
+              </div>
+
+              <div>
+                <label class="block text-slate-400 mb-1">Contact Phone Number *</label>
+                <input type="tel" id="faultPhone" placeholder="e.g., 71234567" class="w-full bg-slate-900 border border-slate-700 text-white rounded-lg p-2.5 focus:outline-none focus:border-blue-500" required />
+              </div>
+
+              <button type="submit" class="w-full bg-blue-700 hover:bg-blue-600 text-white font-bold py-2.5 rounded-lg transition shadow">
+                Create Dispatch Ticket
+              </button>
+            </form>
+            <div id="faultSuccessMsg" class="hidden mt-4 p-3 bg-emerald-950/80 border border-emerald-600/50 rounded-lg text-emerald-200 text-xs">
+              <strong>Dispatch Ticket Created!</strong> Reference: <span id="faultTicketId" class="font-mono text-amber-400 font-bold"></span>. Crew dispatch notified for your area.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. SUPPORT CHAT VIEW -->
+    <div id="view-chat" class="tab-content space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl flex flex-col h-[700px] overflow-hidden">
+        <!-- Chat Header -->
+        <div class="bg-slate-800 p-4 border-b border-slate-700 flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="w-9 h-9 rounded-full bg-blue-900 flex items-center justify-center text-amber-400 font-bold border border-amber-400">⚡</div>
+            <div>
+              <h3 class="text-sm font-bold text-white">PNG Power Virtual Assistant (AI Hub)</h3>
+              <p class="text-[10px] text-emerald-400 flex items-center">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1 animate-pulse"></span> Online &bull; EasiPay, Fraud & Outage Expert
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button onclick="resetChat()" class="text-xs text-slate-300 bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg">Reset Chat</button>
+            <button onclick="switchTab('dashboard')" class="text-xs text-slate-400 hover:text-white bg-slate-800 px-3 py-1.5 rounded-lg">Home</button>
+          </div>
+        </div>
+
+        <!-- Quick Prompt Chips -->
+        <div class="p-2.5 bg-slate-950 border-b border-slate-800 flex flex-wrap gap-1.5 text-xs">
+          <button onclick="sendQuickPrompt('How do I report meter tampering or fraud?')" class="bg-red-950/60 hover:bg-red-900/50 text-red-300 px-2.5 py-1 rounded-full border border-red-700/50 transition">🚨 Report Fraud / Tampering</button>
+          <button onclick="sendQuickPrompt('How do I buy EasiPay on bmobile?')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-full border border-slate-700 transition">📱 Buy via USSD (*775#)</button>
+          <button onclick="sendQuickPrompt('Didn't receive token SMS')" class="bg-slate-800 hover:bg-slate-700 text-amber-300 px-2.5 py-1 rounded-full border border-slate-700 transition">📩 Missing Token (*776#)</button>
+          <button onclick="sendQuickPrompt('Report fallen powerline or hazard')" class="bg-slate-800 hover:bg-slate-700 text-sky-300 px-2.5 py-1 rounded-full border border-slate-700 transition">⚠️ 10m Hazard Rule</button>
+        </div>
+
+        <!-- Chat Messages Container -->
+        <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-3 text-xs">
+          <div class="flex items-start space-x-2">
+            <div class="w-6 h-6 rounded-full bg-blue-900 text-amber-400 flex items-center justify-center font-bold text-[10px] shrink-0">PPL</div>
+            <div class="chat-bubble-bot p-3 rounded-lg max-w-[85%] text-slate-200 space-y-1">
+              <p><strong>Bula & Halo! 👋 Welcome to the PNG Power Virtual Assistant.</strong></p>
+              <p>I can assist you with:</p>
+              <ul class="list-disc list-inside text-slate-300 space-y-0.5">
+                <li>USSD codes for bmobile (*775#), BSP (*131#), and Digicel Cellmoni (*888#).</li>
+                <li>Retrieving unreceived SMS tokens using <strong>*776#</strong>.</li>
+                <li>Confidential power theft & meter tampering reporting procedures.</li>
+                <li>Emergency safety protocols for fallen powerlines and pole stencil identification.</li>
+              </ul>
+              <p class="text-[10px] text-slate-400 pt-1">Type your question below or click a quick prompt chip above.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Input Form -->
+        <form onsubmit="handleUserMessage(event)" class="p-3 bg-slate-800 border-t border-slate-700 flex space-x-2">
+          <input id="chatInput" type="text" placeholder="Ask about EasiPay top-ups, outage reports, USSD codes..." class="flex-1 bg-slate-900 border border-slate-700 text-white rounded-lg px-4 py-2.5 text-xs focus:outline-none focus:border-blue-500" required />
+          <button type="submit" class="bg-blue-700 hover:bg-blue-600 text-white font-bold px-5 py-2.5 rounded-lg text-xs transition flex items-center">
+            Send <i class="fas fa-paper-plane ml-1.5"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- NOTICE MODAL -->
+  <div id="noticeModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl relative text-xs">
+      <button onclick="closeNoticeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg font-bold">&times;</button>
+      <div class="flex items-center space-x-2">
+        <span id="modalCategory" class="bg-blue-900 text-blue-300 px-2.5 py-0.5 rounded font-semibold text-[10px]">Notice</span>
+        <span id="modalDate" class="text-slate-400 text-[11px]"></span>
+      </div>
+      <h3 id="modalTitle" class="text-base font-bold text-white"></h3>
+      <p id="modalBody" class="text-slate-300 leading-relaxed"></p>
+      <div class="flex justify-between items-center pt-3 border-t border-slate-800">
+        <span class="text-slate-500 text-[10px]">PNG Power Communications Directorate</span>
+        <button onclick="closeNoticeModal()" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg font-semibold">Close Notice</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-slate-950 border-t border-slate-800 text-slate-500 py-4 text-center text-xs mt-auto">
+    <div class="max-w-7xl mx-auto px-4 space-y-1">
+      <p>PNG Power Limited — National Call Centre: <strong class="text-white">116</strong> (Toll-Free, 24/7) | Head Office: Corner Wards Road & Hohola, Port Moresby.</p>
+      <p class="text-[11px] text-slate-600">&copy; 2026 PNG Power Ltd. All rights reserved. Secure Digital Portal.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Tab Navigation
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.getElementById('view-' + tabId).classList.add('active');
+
+      // Update Desktop Nav styles
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.className = "nav-btn px-3 py-2 rounded-lg text-slate-300 hover:bg-blue-800/60 hover:text-white transition";
+      });
+      event?.currentTarget?.classList?.contains('nav-btn') && (event.currentTarget.className = "nav-btn px-3 py-2 rounded-lg bg-blue-900/60 text-white transition");
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Grid Info Switcher
+    function selectGrid(gridType) {
+      document.querySelectorAll('[id^="grid-tab-"]').forEach(el => {
+        el.className = "bg-slate-950 border border-slate-800 hover:border-slate-700 p-4 rounded-xl cursor-pointer transition shadow";
+      });
+      document.getElementById('grid-tab-' + gridType).className = "bg-blue-950 border-2 border-blue-500 p-4 rounded-xl cursor-pointer transition shadow";
+
+      const container = document.getElementById('grid-detail-content');
+      if (gridType === 'pom') {
+        container.innerHTML = `
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-800 pb-3 gap-2">
+            <div>
+              <h4 class="text-sm font-bold text-white text-base">Port Moresby Interconnected System (POMIS)</h4>
+              <p class="text-slate-400">Supplying National Capital District, Central Province, LNG plant, and industrial corridors.</p>
+            </div>
+            <span class="bg-emerald-950 text-emerald-400 border border-emerald-600/40 px-3 py-1 rounded-full font-bold">System Status: Stable (Normal Load)</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-slate-900 p-3 rounded-lg border border-slate-800"><span class="text-slate-400 block mb-1">Primary Generation Stations</span><strong class="text-white">Rouna 1, 2, 3 & 4 Hydro, Sirinumu Dam, NiuPower (LNG) & Dirio Gas Power.</strong></div>
+            <div class="bg-slate-900 p-3 rounded-lg border border-slate-800"><span class="text-slate-400 block mb-1">Transmission Voltages</span><strong class="text-amber-400">66kV & 33kV Transmission Ring; 11kV Distribution Feeders.</strong></div>
+            <div class="bg-slate-900 p-3 rounded-lg border border-slate-800"><span class="text-slate-400 block mb-1">Electrical Standards</span><strong class="text-blue-400">240V / 415V (Single / Three Phase), 50Hz AC.</strong></div>
+          </div>
+        `;
+      } else if (gridType === 'ramu') {
+        container.innerHTML = `
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-800 pb-3 gap-2">
+            <div>
+              <h4 class="text-sm font-bold text-white text-base">Ramu Grid System (Momase & Highlands Corridor)</h4>
+              <p class="text-slate-400">Interconnecting Lae, Madang, Goroka, Mt. Hagen, Kundiawa, and Kainantu mining loads.</p>
+            </div>
+            <span class="bg-emerald-950 text-emerald-400 border border-emerald-600/40 px-3 py-1 rounded-full font-bold">System Status: Stable (Generation Normal)</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-slate-900 p-3 rounded-lg border border-slate-800"><span class="text-slate-400 block mb-1">Primary Generation</span><strong class="text-white">Yonki Dam, Ramu 1 Hydroelectric Power Station (50+ MW capacity).</strong></div>
+            <div class="bg-slate-900 p-3 rounded-lg border border-slate-800"><span class="text-slate-400 block mb-1">Transmission Grid</span><strong class="text-amber-400">132kV Transmission backbone linking Yonki to Lae, Madang & Highlands substations.</strong></div>
+            <div class="bg-slate-900 p-3 rounded-lg border border-slate-800"><span class="text-slate-400 block mb-1">Grid Reliability</span><strong class="text-blue-400">Scheduled maintenance ongoing for Yonki tailrace regulators.</strong></div>
+          </div>
+        `;
+      } else if (gridType === 'gazelle') {
+        container.innerHTML = `
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-800 pb-3 gap-2">
+            <div>
+              <h4 class="text-sm font-bold text-white text-base">Gazelle Grid System (East New Britain)</h4>
+              <p class="text-slate-400">Serving Kokopo, Rabaul, Keravat, and surrounding agricultural and tourism hubs.</p>
+            </div>
+            <span class="bg-emerald-950 text-emerald-400 border border-emerald-600/40 px-3 py-1 rounded-full font-bold">System Status: Stable (Solar-Diesel Hybrid)</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-slate-900 p-3 rounded-lg border border-slate-800"><span class="text-slate-400 block mb-1">Generation Sources</span><strong class="text-white">Warangoi Hydroelectric Station & Ulagunan Diesel Power Station.</strong></div>
+            <div class="bg-slate-900 p-3 rounded-lg border border-slate-800"><span class="text-slate-400 block mb-1">Renewable Integration</span><strong class="text-amber-400">New 5MW Solar PV integration project commissioning.</strong></div>
+            <div class="bg-slate-900 p-3 rounded-lg border border-slate-800"><span class="text-slate-400 block mb-1">Grid Voltage</span><strong class="text-blue-400">22kV Distribution, 240V/415V Customer connection level.</strong></div>
+          </div>
+        `;
+      }
+    }
+
+    // Filter Notices
+    function filterNotices(category) {
+      document.querySelectorAll('[id^="notice-filter-"]').forEach(btn => {
+        btn.className = "bg-slate-800 text-slate-300 hover:bg-slate-700 px-3 py-1.5 rounded-lg transition";
+      });
+      document.getElementById('notice-filter-' + category).className = "bg-emerald-600 text-white font-semibold px-3 py-1.5 rounded-lg transition";
+
+      document.querySelectorAll('.notice-item').forEach(item => {
+        if (category === 'all' || item.getAttribute('data-category') === category) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+
+    // Modal
+    function openNoticeModal(title, date, category, body) {
+      document.getElementById('modalTitle').innerText = title;
+      document.getElementById('modalDate').innerText = date;
+      document.getElementById('modalCategory').innerText = category;
+      document.getElementById('modalBody').innerText = body;
+      document.getElementById('noticeModal').classList.remove('hidden');
+    }
+    function closeNoticeModal() {
+      document.getElementById('noticeModal').classList.add('hidden');
+    }
+
+    // Office Search Filter
+    function filterOffices() {
+      const q = document.getElementById('officeSearch').value.toLowerCase();
+      document.querySelectorAll('.office-card').forEach(card => {
+        const text = card.innerText.toLowerCase();
+        card.style.display = text.includes(q) ? 'block' : 'none';
+      });
+    }
+
+    // Fraud Report Form Submission
+    function submitFraudReport(e) {
+      e.preventDefault();
+      const ticketNum = 'PPL-RPU-' + Math.floor(10000 + Math.random() * 90000);
+      document.getElementById('fraudTicketId').innerText = ticketNum;
+      document.getElementById('fraudSuccessMsg').classList.remove('hidden');
+      e.target.reset();
+    }
+
+    // Fault Ticket Submission
+    function submitFaultTicket(e) {
+      e.preventDefault();
+      const ticketNum = 'PPL-FLT-' + Math.floor(10000 + Math.random() * 90000);
+      document.getElementById('faultTicketId').innerText = ticketNum;
+      document.getElementById('faultSuccessMsg').classList.remove('hidden');
+      e.target.reset();
+    }
+
+    // Chatbot Knowledge Base & Logic
+    const kb = [
+      {
+        keywords: ['fraud', 'tamper', 'illegal', 'theft', 'bypass', 'bridging', 'hook-up'],
+        answer: "<strong>Reporting Power Theft & Fraud:</strong><br>Illegal power connections, meter tampering, and bridging are serious criminal offences that cause safety hazards and house fires.<br><br><strong>How to Report Confidentially:</strong><br>&bull; Call the 24/7 National Call Centre on toll-free <strong class='text-red-400'>116</strong>.<br>&bull; Use the <button onclick="switchTab('fraud')" class='text-blue-400 underline font-bold'>Report Fraud</button> tab in this portal.<br>&bull; Email specific location and suspect details to <a href='mailto:callcentre@pngpower.org' class='text-blue-400 underline'>callcentre@pngpower.org</a>.<br><br><em>All reports are handled strictly confidentially.</em>"
+      },
+      {
+        keywords: ['bmobile', '775', '776', 'telekom', 'telikom'],
+        answer: "<strong>Buying via bmobile (*775#):</strong><br>1. Dial <strong>*775#</strong>.<br>2. Enter your 11-digit EasiPay meter number.<br>3. Enter purchase amount (Min K15, Max K50).<br>4. Press 1 to confirm.<br><br><strong>Didn't get SMS Token?</strong> Dial <strong class='text-amber-400'>*776#</strong> and enter your meter number to retrieve your last token on your screen."
+      },
+      {
+        keywords: ['bsp', '131', 'bank south pacific'],
+        answer: "<strong>Buying via BSP Mobile Banking (*131#):</strong><br>1. Dial <strong>*131#</strong> on your phone.<br>2. Enter your 4-digit PIN.<br>3. Select <em>TopUp Services</em> &rarr; <em>Easipay</em>.<br>4. Select account, enter 11-digit meter number & amount."
+      },
+      {
+        keywords: ['cellmoni', 'digicel', '888'],
+        answer: "<strong>Buying via Digicel Cellmoni (*888#):</strong><br>1. Dial <strong>*888#</strong>.<br>2. Select Option 2 (Top-up services) &rarr; Option 2 (Easipay).<br>3. Enter meter number, amount (min K15), and PIN.<br><em>Note: Cellmoni charges zero service fees for EasiPay.</em>"
+      },
+      {
+        keywords: ['fallen', 'line', 'wire', 'danger', 'spark', 'hazard', 'safety', '10m'],
+        answer: "<span class='text-red-400 font-bold'>⚠️ EMERGENCY HAZARD PROTOCOL:</span><br>1. Stay at least <strong>10 meters away</strong> from fallen powerlines or sparking transformers.<br>2. Keep children and bystanders clear.<br>3. Call PNG Power Call Centre on <strong class='text-red-400'>116</strong> immediately.<br>4. Note the nearest <strong>Pole Identification Tag</strong> (e.g. POM-A12-04) to help dispatch emergency crews."
+      },
+      {
+        keywords: ['pole', 'tag', 'number', 'stencil', 'location'],
+        answer: "<strong>How to identify Utility Pole Numbers:</strong><br>Look at the wooden or concrete pole near the fault. Look for a yellow metal plate or painted stencil code (e.g., <strong>POM-A12-04</strong> or <strong>LAE-R1-09</strong>). Quoting this stencil code when calling 116 allows line technicians to locate the outage immediately."
+      },
+      {
+        keywords: ['error', 'keypad', '000', '001', 'code', 'meter'],
+        answer: "<strong>Common Meter Keypad Diagnostics:</strong><br>&bull; <strong>000 [ENTER]:</strong> Displays current credit balance in kWh.<br>&bull; <strong>001 [ENTER]:</strong> Displays total cumulative kWh used.<br>&bull; <strong>Error 30:</strong> Token rejected. Re-check the 20 digits and ensure your 11-digit meter number was entered accurately during purchase."
+      }
+    ];
+
+    function handleUserMessage(e) {
+      e.preventDefault();
+      const inputEl = document.getElementById('chatInput');
+      const text = inputEl.value.trim();
+      if (!text) return;
+
+      appendMessage(text, 'user');
+      inputEl.value = '';
+
+      setTimeout(() => {
+        const botReply = generateReply(text);
+        appendMessage(botReply, 'bot');
+      }, 500);
+    }
+
+    function sendQuickPrompt(promptText) {
+      appendMessage(promptText, 'user');
+      setTimeout(() => {
+        const botReply = generateReply(promptText);
+        appendMessage(botReply, 'bot');
+      }, 400);
+    }
+
+    function generateReply(userQuery) {
+      const q = userQuery.toLowerCase();
+      for (const item of kb) {
+        if (item.keywords.some(k => q.includes(k))) {
+          return item.answer;
+        }
+      }
+      return "I can assist with reporting meter tampering or power theft, EasiPay top-ups (*775#/*131#/*888#), unreceived SMS tokens (*776#), hazard reporting, and utility pole identification. Call the 24/7 hotline at <strong>116</strong> for direct support.";
+    }
+
+    function appendMessage(msg, sender) {
+      const container = document.getElementById('chatMessages');
+      const div = document.createElement('div');
+      div.className = `flex items-start space-x-2 ${sender === 'user' ? 'justify-end' : ''}`;
+      
+      if (sender === 'user') {
+        div.innerHTML = `<div class="chat-bubble-user p-3 rounded-lg max-w-[80%] text-white">${msg}</div>`;
+      } else {
+        div.innerHTML = `
+          <div class="w-6 h-6 rounded-full bg-blue-900 text-amber-400 flex items-center justify-center font-bold text-[10px] shrink-0">PPL</div>
+          <div class="chat-bubble-bot p-3 rounded-lg max-w-[85%] text-slate-200">${msg}</div>
+        `;
+      }
+      
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function resetChat() {
+      document.getElementById('chatMessages').innerHTML = `
+        <div class="flex items-start space-x-2">
+          <div class="w-6 h-6 rounded-full bg-blue-900 text-amber-400 flex items-center justify-center font-bold text-[10px] shrink-0">PPL</div>
+          <div class="chat-bubble-bot p-3 rounded-lg max-w-[85%] text-slate-200 space-y-1">
+            <p><strong>Chat reset. How can PNG Power assist you today?</strong></p>
+          </div>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
