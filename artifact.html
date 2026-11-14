@@ -1,0 +1,2414 @@
+
+
+
+
+
+<meta name="description" content="Simulated utility customer and dispatch portal demo. No real payments or dispatch.">
+<title>Stepwise Demo Utility Portal</title>
+<style>
+:root{--brand:#0f5f73;--brand-ink:#ffffff;--bg:#f4f6f8;--card:#ffffff;--ink:#14212b;--muted:#5b6b78;--line:#d9e0e6;--ok:#1b7f4b;--warn:#b76e00;--bad:#b3261e;--info:#1d4ed8;--radius:12px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1620;--card:#162331;--ink:#e6edf3;--muted:#9fb0bd;--line:#26384a}}
+:root[data-theme="dark"]{--bg:#0e1620;--card:#162331;--ink:#e6edf3;--muted:#9fb0bd;--line:#26384a}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+body{min-height:100vh;overflow-x:hidden}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.sr{position:absolute;left:-9999px}
+header.top{background:var(--brand);color:var(--brand-ink);position:sticky;top:0;z-index:20}
+.wrap{max-width:1100px;margin:0 auto;padding:0 16px}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0}
+.brand-name{font-weight:800;font-size:18px;letter-spacing:.2px}
+.brand-tag{font-size:12px;opacity:.85}
+.menu-btn{background:transparent;border:1px solid rgba(255,255,255,.5);color:#fff;border-radius:8px;padding:6px 10px;display:none}
+nav.tabs{display:flex;gap:4px;overflow-x:auto;padding-bottom:10px;scrollbar-width:thin}
+nav.tabs button{flex:0 0 auto;background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:999px;padding:6px 12px;font-size:13px}
+nav.tabs button[aria-current="page"]{background:#fff;color:var(--brand);font-weight:700}
+.demo-banner{background:#fff4d6;color:#5a4300;font-size:13px;padding:8px 0;border-bottom:1px solid #f0d98a}
+:root[data-theme="dark"] .demo-banner{background:#3a2f10;color:#f5e3a3;border-color:#5b4818}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .demo-banner{background:#3a2f10;color:#f5e3a3;border-color:#5b4818}}
+main{padding:20px 0 40px}
+h1{font-size:24px;margin:4px 0 6px}
+h2{font-size:17px;margin:0 0 10px}
+.sub{color:var(--muted);margin:0 0 16px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;min-width:0}
+.stats{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.stat b{display:block;font-size:24px}
+.stat span{color:var(--muted);font-size:13px}
+label{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
+input,select,textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);min-width:0}
+textarea{min-height:70px;resize:vertical}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row>*{flex:1 1 140px}
+.row>.auto{flex:0 0 auto}
+.btn{background:var(--brand);color:#fff;border:0;border-radius:8px;padding:10px 14px;font-weight:600}
+.btn.ghost{background:transparent;color:var(--brand);border:1px solid var(--brand)}
+.btn.bad{background:var(--bad)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.small{padding:5px 9px;font-size:13px}
+.pill{display:inline-block;font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--line);color:var(--ink)}
+.pill.p1,.pill.bad{background:#fde2e0;color:#7a1510}
+.pill.p2,.pill.warn{background:#fff0cf;color:#6a4300}
+.pill.p3{background:#dbeafe;color:#1e3a8a}
+.pill.ok{background:#d8f3e3;color:#0f5132}
+.led{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:middle;background:#999}
+.led.green{background:#22c55e;box-shadow:0 0 8px #22c55e}
+.led.amber{background:#f59e0b;box-shadow:0 0 8px #f59e0b}
+.led.red{background:#ef4444;box-shadow:0 0 8px #ef4444;animation:blink 1s steps(2) infinite}
+.led.none{background:#6b7280}
+@keyframes blink{50%{opacity:.2}}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600}
+.scroll{overflow-x:auto}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14px}
+.kv div:nth-child(odd){color:var(--muted)}
+.notice{border-left:4px solid var(--brand);padding:8px 12px;background:var(--card);border-radius:8px;margin:8px 0;font-size:14px}
+.notice.warn{border-color:var(--warn)}
+.notice.bad{border-color:var(--bad)}
+.notice.ok{border-color:var(--ok)}
+.steps{counter-reset:s;display:grid;gap:8px;padding:0;list-style:none}
+.steps li{counter-increment:s;padding-left:34px;position:relative}
+.steps li:before{content:counter(s);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--brand);color:#fff;text-align:center;line-height:24px;font-weight:700;font-size:13px}
+.progress{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.progress>i{display:block;height:100%;background:var(--brand)}
+.progress.warn>i{background:var(--warn)}
+.progress.bad>i{background:var(--bad)}
+.timeline{list-style:none;padding:0;margin:0}
+.timeline li{padding:6px 0 6px 16px;border-left:2px solid var(--line);position:relative;font-size:14px}
+.timeline li:before{content:"";position:absolute;left:-6px;top:11px;width:10px;height:10px;border-radius:50%;background:var(--brand)}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#14212b;color:#fff;padding:10px 16px;border-radius:10px;z-index:50;max-width:92vw;font-size:14px;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:40;padding:16px}
+.modal .card{max-width:620px;width:100%;max-height:85vh;overflow:auto}
+.chat{display:flex;flex-direction:column;gap:10px;max-height:52vh;overflow-y:auto;padding:4px}
+.msg{max-width:88%;padding:10px 12px;border-radius:12px;white-space:pre-wrap;font-size:14px}
+.msg.user{align-self:flex-end;background:var(--brand);color:#fff}
+.msg.bot{align-self:flex-start;background:var(--bg);border:1px solid var(--line)}
+.msg .tool{font:12px ui-monospace,Menlo,Consolas,monospace;color:var(--muted);display:block;margin-bottom:4px}
+.msg ul{margin:6px 0 0 16px;padding:0}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.chips button{background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:4px 10px;font-size:13px}
+.hidden{display:none!important}
+.hero{background:linear-gradient(135deg,var(--brand),#1b8aa6);color:#fff;border-radius:var(--radius);padding:22px;margin-bottom:16px}
+.hero p{margin:6px 0 0;opacity:.92}
+.hero a{color:#fff}
+code,.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
+.token{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:18px;font-weight:700;letter-spacing:1px;color:var(--brand);word-break:break-all}
+.muted{color:var(--muted);font-size:13px}
+.split{display:grid;gap:14px;grid-template-columns:1fr}
+@media (min-width:860px){.split{grid-template-columns:1fr 1fr}}
+@media (max-width:720px){
+  .menu-btn{display:inline-block}
+  nav.tabs{display:none;flex-direction:column;overflow:visible;padding:0 0 10px}
+  nav.tabs.open{display:flex}
+  nav.tabs button{border-radius:8px;text-align:left}
+  .wrap{padding:0 16px}
+}
+
+</style>
+
+
+<header class="top">
+  <div class="wrap">
+    <div class="bar">
+      <div>
+        <div class="brand-name" id="brandName">Demo Utility</div>
+        <div class="brand-tag" id="brandTag">Customer &amp; Dispatch Portal</div>
+      </div>
+      <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="tabs" type="button">Menu</button>
+    </div>
+    <nav class="tabs" id="tabs" aria-label="Main"></nav>
+  </div>
+</header>
+<div class="demo-banner"><div class="wrap">Simulation only. Data is stored in this browser. No real payments, tokens, tickets or dispatch happen here. <span id="storageNote"></span></div></div>
+<main class="wrap" id="view" aria-live="polite"></main>
+<div id="layer"></div>
+<script>
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory();
+  else root.StepwiseEngine = factory();
+})(typeof self !== 'undefined' ? self : this, function () {
+  'use strict';
+
+  const SCHEMA_VERSION = 2;
+  const DB_KEY = 'stepwise_utility_demo_db_v2';
+  const TZ = 'Pacific/Port_Moresby';
+  const MIN = 60000;
+
+  class ApiError extends Error {
+    constructor(code, message, status) {
+      super(message);
+      this.name = 'ApiError';
+      this.code = code;
+      this.status = status || 400;
+    }
+  }
+
+  // ---------- small helpers ----------
+  const clone = (o) => JSON.parse(JSON.stringify(o));
+  const pad = (n, w) => String(n).padStart(w, '0');
+
+  function luhnCheckDigit(base) {
+    let sum = 0, dbl = true;
+    for (let i = base.length - 1; i >= 0; i--) {
+      let d = +base[i];
+      if (dbl) { d *= 2; if (d > 9) d -= 9; }
+      sum += d; dbl = !dbl;
+    }
+    return String((10 - (sum % 10)) % 10);
+  }
+  function luhnValid(num) {
+    if (!/^\d+$/.test(num)) return false;
+    let sum = 0, dbl = false;
+    for (let i = num.length - 1; i >= 0; i--) {
+      let d = +num[i];
+      if (dbl) { d *= 2; if (d > 9) d -= 9; }
+      sum += d; dbl = !dbl;
+    }
+    return sum % 10 === 0;
+  }
+  function haversineM(lat1, lng1, lat2, lng2) {
+    const R = 6371000, rad = Math.PI / 180;
+    const dLat = (lat2 - lat1) * rad, dLng = (lng2 - lng1) * rad;
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * rad) * Math.cos(lat2 * rad) * Math.sin(dLng / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(a));
+  }
+  function offsetLatLng(lat, lng, dxM, dyM) {
+    return { lat: lat + dyM / 111320, lng: lng + dxM / (111320 * Math.cos(lat * Math.PI / 180)) };
+  }
+
+  // Pure-JS SHA-256 (sync). Demo-grade credential hashing only.
+  function sha256(str) {
+    const ascii = unescape(encodeURIComponent(String(str)));
+    function rr(v, a) { return (v >>> a) | (v << (32 - a)); }
+    const pow = Math.pow, maxWord = pow(2, 32);
+    let i, j, result = '';
+    const words = [];
+    const bitLen = ascii.length * 8;
+    let hash = sha256.h = sha256.h || [];
+    const k = sha256.k = sha256.k || [];
+    let pc = k.length;
+    const comp = {};
+    for (let c = 2; pc < 64; c++) {
+      if (!comp[c]) {
+        for (i = 0; i < 313; i += c) comp[i] = c;
+        hash[pc] = (pow(c, 0.5) * maxWord) | 0;
+        k[pc++] = (pow(c, 1 / 3) * maxWord) | 0;
+      }
+    }
+    let msg = ascii + '\x80';
+    while (msg.length % 64 - 56) msg += '\x00';
+    for (i = 0; i < msg.length; i++) {
+      j = msg.charCodeAt(i);
+      words[i >> 2] |= j << ((3 - i) % 4) * 8;
+    }
+    words[words.length] = ((bitLen / maxWord) | 0);
+    words[words.length] = bitLen;
+    for (j = 0; j < words.length;) {
+      const w = words.slice(j, j += 16);
+      const old = hash;
+      hash = hash.slice(0, 8);
+      for (i = 0; i < 64; i++) {
+        const w15 = w[i - 15], w2 = w[i - 2];
+        const a = hash[0], e = hash[4];
+        const t1 = hash[7] + (rr(e, 6) ^ rr(e, 11) ^ rr(e, 25)) + ((e & hash[5]) ^ (~e & hash[6])) + k[i] +
+          (w[i] = (i < 16) ? w[i] : (w[i - 16] + (rr(w15, 7) ^ rr(w15, 18) ^ (w15 >>> 3)) + w[i - 7] + (rr(w2, 17) ^ rr(w2, 19) ^ (w2 >>> 10))) | 0);
+        const t2 = (rr(a, 2) ^ rr(a, 13) ^ rr(a, 22)) + ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
+        hash = [(t1 + t2) | 0].concat(hash);
+        hash[4] = (hash[4] + t1) | 0;
+      }
+      for (i = 0; i < 8; i++) hash[i] = (hash[i] + old[i]) | 0;
+    }
+    for (i = 0; i < 8; i++) for (j = 3; j + 1; j--) {
+      const b = (hash[i] >> (j * 8)) & 255;
+      result += (b < 16 ? '0' : '') + b.toString(16);
+    }
+    return result;
+  }
+
+  function defaultRng(n) {
+    const a = new Uint8Array(n);
+    let c = (typeof crypto !== 'undefined' && crypto.getRandomValues) ? crypto : null;
+    if (!c && typeof require === 'function') c = require('node:crypto').webcrypto;
+    if (!c) throw new Error('No secure random source available');
+    c.getRandomValues(a);
+    return a;
+  }
+
+  function makeStorage(ls) {
+    let ok = false;
+    const mem = new Map();
+    if (ls) {
+      try { ls.setItem('__sw_probe', '1'); ls.removeItem('__sw_probe'); ok = true; } catch (e) { ok = false; }
+    }
+    return {
+      persistent: ok,
+      get(k) { if (ok) { try { return ls.getItem(k); } catch (e) { return null; } } return mem.has(k) ? mem.get(k) : null; },
+      set(k, v) { if (ok) ls.setItem(k, v); else mem.set(k, v); },
+      remove(k) { if (ok) { try { ls.removeItem(k); } catch (e) { /* ignore */ } } else mem.delete(k); }
+    };
+  }
+
+  // ---------- static demo configuration ----------
+  const FAULT_CATS = {
+    AREA_BLACKOUT: { label: 'Area / street blackout', priority: 'P2', group: 'AREA' },
+    SINGLE_PREMISES: { label: 'Single premises - no power (credit available)', priority: 'P3', group: 'PREMISES' },
+    HAZARD: { label: 'Sparking transformer / fallen or low wires', priority: 'P1', group: 'HAZARD' },
+    POLE: { label: 'Damaged or leaning pole', priority: 'P2', group: 'POLE' }
+  };
+  const TIP_CATS = {
+    HOOKUP: 'Illegal direct wire hook-up',
+    TAMPER: 'Meter tampering / broken seal',
+    BYPASS: 'Meter bypass / bridging',
+    UNREGISTERED: 'Unregistered connection'
+  };
+  const STAGES = {
+    FAULT: ['Logged', 'Verified', 'Crew Dispatched', 'On Site', 'Resolved'],
+    TIP: ['Received', 'Under Review', 'Field Audit', 'Closed']
+  };
+  const TARGET_MIN = { P1: 30, P2: 240, P3: 480 };
+  const POLE_RE = /^[A-Z]{3}-[A-Z]\d{1,2}-\d{1,3}$/;
+  const ALPHA32 = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+  const SUBURBS = [
+    { id: 'boroko', name: 'Boroko', grid: 'capital', lat: -9.4790, lng: 147.1920 },
+    { id: 'hohola', name: 'Hohola', grid: 'capital', lat: -9.4660, lng: 147.1830 },
+    { id: 'gerehu', name: 'Gerehu', grid: 'capital', lat: -9.4020, lng: 147.1630 },
+    { id: 'waigani', name: 'Waigani', grid: 'capital', lat: -9.4260, lng: 147.1840 },
+    { id: 'four-mile', name: '4-Mile', grid: 'capital', lat: -9.4700, lng: 147.1570 },
+    { id: 'badili', name: 'Badili', grid: 'capital', lat: -9.4780, lng: 147.1620 },
+    { id: 'konedobu', name: 'Konedobu', grid: 'capital', lat: -9.4920, lng: 147.1480 },
+    { id: 'gordons', name: 'Gordons', grid: 'capital', lat: -9.4400, lng: 147.2100 },
+    { id: 'lae', name: 'Lae (Top Town)', grid: 'highlands', lat: -6.7300, lng: 146.9990 },
+    { id: 'madang', name: 'Madang Town', grid: 'highlands', lat: -5.2250, lng: 145.7900 },
+    { id: 'goroka', name: 'Goroka', grid: 'highlands', lat: -6.0830, lng: 145.3880 },
+    { id: 'hagen', name: 'Mt. Hagen', grid: 'highlands', lat: -5.8600, lng: 144.2200 },
+    { id: 'kokopo', name: 'Kokopo', grid: 'islands', lat: -4.3500, lng: 152.2640 },
+    { id: 'kimbe', name: 'Kimbe', grid: 'islands', lat: -5.5500, lng: 150.1400 },
+    { id: 'alotau', name: 'Alotau', grid: 'provincial', lat: -10.3100, lng: 150.4500 },
+    { id: 'wewak', name: 'Wewak', grid: 'provincial', lat: -3.5500, lng: 143.6300 }
+  ];
+  const POLE_SEEDS = [
+    ['POM-A12-04', 'waigani', 0, 0], ['POM-A12-05', 'waigani', 200, 100], ['POM-A12-40', 'waigani', 900, 0],
+    ['POM-C4-12', 'four-mile', 50, -30], ['POM-G2-09', 'gerehu', -80, 120], ['POM-B14-08', 'boroko', 150, 60]
+  ];
+  const GRIDS = {
+    capital: {
+      name: 'Capital Grid', aliases: ['port moresby', 'moresby', 'ncd', 'capital'], capacity_mw: 150, base_mw: 112,
+      specs: '66 kV transmission / 11 kV distribution (sample)',
+      overview: 'Sample description: a hydro + gas + thermal mix serving the capital district. Replace with the client\'s verified figures.',
+      mix: [{ label: 'Gas-fired baseload', pct: 56 }, { label: 'Hydropower', pct: 32 }, { label: 'Thermal reserve', pct: 12 }]
+    },
+    highlands: {
+      name: 'Momase & Highlands Grid', aliases: ['highlands', 'momase', 'lae', 'madang', 'goroka', 'hagen', 'ramu'], capacity_mw: 130, base_mw: 91,
+      specs: '132 kV / 66 kV backbone, 22 kV / 11 kV distribution (sample)',
+      overview: 'Sample description: a long high-voltage corridor linking coastal and highland towns.',
+      mix: [{ label: 'Hydropower', pct: 68 }, { label: 'Thermal & IPP', pct: 32 }]
+    },
+    islands: {
+      name: 'Islands Grid', aliases: ['islands', 'new britain', 'kokopo', 'kimbe', 'rabaul', 'gazelle'], capacity_mw: 25, base_mw: 13,
+      specs: '66 kV / 22 kV / 11 kV (sample)',
+      overview: 'Sample description: a small regional grid with hydro and thermal backup.',
+      mix: [{ label: 'Hydropower', pct: 62 }, { label: 'Thermal backup', pct: 38 }]
+    },
+    provincial: {
+      name: 'Provincial Mini-Grids', aliases: ['provincial', 'alotau', 'wewak', 'mini-grid', 'c-centre'], capacity_mw: 60, base_mw: 44,
+      specs: '22 kV / 11 kV primary distribution (sample)',
+      overview: 'Sample description: isolated municipal grids, mostly diesel with solar hybrids.',
+      mix: [{ label: 'Diesel generation', pct: 78 }, { label: 'Solar PV + battery', pct: 22 }]
+    }
+  };
+  const CHANNELS = [
+    { id: 'bank_ussd', label: 'Bank mobile banking (USSD)', fee_toea: 50, fee_pct: 0, min_toea: 1000, max_toea: 500000 },
+    { id: 'wallet', label: 'Mobile wallet', fee_toea: 0, fee_pct: 0, min_toea: 1000, max_toea: 500000 },
+    { id: 'telco', label: 'Telco airtime billing (USSD)', fee_toea: 0, fee_pct: 0, min_toea: 1500, max_toea: 5000 },
+    { id: 'bank_pay', label: 'Bank pay app', fee_toea: 50, fee_pct: 0, min_toea: 1000, max_toea: 500000 },
+    { id: 'card', label: 'Visa / Mastercard (web)', fee_toea: 0, fee_pct: 0.015, min_toea: 1000, max_toea: 500000 }
+  ];
+  const CREWS = [
+    { id: 'c1', name: 'Capital North Line Crew', grid: 'capital', type: 'LINE' },
+    { id: 'c2', name: 'Capital South Line Crew', grid: 'capital', type: 'LINE' },
+    { id: 'c3', name: 'Highlands Line Crew', grid: 'highlands', type: 'LINE' },
+    { id: 'c4', name: 'Islands Line Crew', grid: 'islands', type: 'LINE' },
+    { id: 'c5', name: 'Provincial Line Crew', grid: 'provincial', type: 'LINE' },
+    { id: 'r1', name: 'Revenue Protection Audit Team A', grid: 'capital', type: 'RPU' },
+    { id: 'r2', name: 'Revenue Protection Audit Team B', grid: 'highlands', type: 'RPU' }
+  ];
+  const OFFICES = [
+    ['Boroko Customer Service Centre', 'Port Moresby (Boroko)', 'Southern'],
+    ['Hohola Main Customer Service Centre', 'Port Moresby (Hohola)', 'Southern'],
+    ['Alotau Customer Service Centre', 'Alotau', 'Southern'],
+    ['Lae Customer Service Centre', 'Lae', 'Momase'],
+    ['Madang Customer Service Centre', 'Madang', 'Momase'],
+    ['Wewak Customer Service Centre', 'Wewak', 'Momase'],
+    ['Mt. Hagen Customer Service Centre', 'Mt. Hagen', 'Highlands'],
+    ['Goroka Customer Service Centre', 'Goroka', 'Highlands'],
+    ['Kokopo Customer Service Centre', 'Kokopo', 'New Guinea Islands'],
+    ['Kimbe Customer Service Centre', 'Kimbe', 'New Guinea Islands']
+  ].map(([name, town, region]) => ({
+    name, town, region,
+    address: 'Sample address - replace with the client\'s verified list',
+    hours: 'Mon-Fri 8:00-16:30 (sample)'
+  }));
+
+  // =====================================================================
+  function create(opts) {
+    opts = opts || {};
+    const nowFn = opts.now || (() => new Date());
+    const rng = opts.rng || defaultRng;
+    const storage = makeStorage(opts.storage);
+    const listeners = [];
+    let db = null, lastRaw = null;
+
+    const iso = () => nowFn().toISOString();
+    const ms = (s) => new Date(s).getTime();
+    const E = (code, msg, status) => new ApiError(code, msg, status);
+
+    function randFrom(alpha, n) {
+      let out = '';
+      while (out.length < n) {
+        const bytes = rng(n * 2);
+        for (const b of bytes) { if (b < 256 - (256 % alpha.length) && out.length < n) out += alpha[b % alpha.length]; }
+      }
+      return out;
+    }
+    const randDigits = (n) => randFrom('0123456789', n);
+    const hashSecret = (secret, salt) => sha256(salt + ':' + secret);
+    const next = (w, name, start) => { w.counters[name] = (w.counters[name] === undefined ? (start || 0) : w.counters[name]) + 1; return w.counters[name]; };
+    const kina = (t) => 'K' + (t / 100).toFixed(2);
+
+    function audit(w, actor, action, entity, detail) {
+      w.audit.push({ id: 'AUD-' + pad(next(w, 'aud'), 6), at: iso(), actor: actor || 'system', action, entity: entity || '', detail: detail || '' });
+      if (w.audit.length > 500) w.audit.splice(0, w.audit.length - 500);
+    }
+
+    // ---------- persistence ----------
+    function emit() { listeners.forEach((fn) => { try { fn(); } catch (e) { /* ignore */ } }); }
+    function persist(w) { const text = JSON.stringify(w); storage.set(DB_KEY, text); lastRaw = text; }
+    function refresh() {
+      const raw = storage.get(DB_KEY);
+      if (db && raw === lastRaw) return;
+      if (raw == null) { if (!db) db = seedDb(); persist(db); return; }
+      try {
+        const parsed = JSON.parse(raw);
+        if (!parsed || !parsed.meta || parsed.meta.schema !== SCHEMA_VERSION) throw new Error('schema');
+        db = parsed; lastRaw = raw;
+      } catch (e) {
+        try { storage.set(DB_KEY + '_corrupt', raw); } catch (e2) { /* ignore */ }
+        db = seedDb(); persist(db);
+      }
+    }
+    function transact(fn) {
+      refresh();
+      const w = clone(db);
+      sweep(w);
+      const out = fn(w);
+      w.meta.rev = (db.meta.rev || 0) + 1;
+      w.meta.updated_at = iso();
+      try { persist(w); } catch (e) {
+        throw E('STORAGE_FULL', 'Could not save to browser storage (full or blocked). Nothing was changed.', 507);
+      }
+      db = w;
+      emit();
+      if (out && out.__err) throw out.__err;
+      return out;
+    }
+    function read() { refresh(); return db; }
+
+    function sweep(w) {
+      const t = nowFn().getTime();
+      for (const p of w.payments) {
+        if (p.status === 'PENDING' && ms(p.expires_at) <= t) { p.status = 'EXPIRED'; p.failure_reason = 'No confirmation received in time'; }
+      }
+      for (const k of Object.keys(w.sessions)) if (ms(w.sessions[k].expires_at) <= t) delete w.sessions[k];
+      const ids = Object.keys(w.idem);
+      if (ids.length > 300) ids.slice(0, ids.length - 300).forEach((k) => delete w.idem[k]);
+    }
+
+    // ---------- auth / sessions / lockouts ----------
+    function makeSession(w, scope, extra, minutes) {
+      const token = randFrom(ALPHA32, 32);
+      const expires_at = new Date(nowFn().getTime() + minutes * MIN).toISOString();
+      w.sessions[token] = Object.assign({ scope, expires_at }, extra || {});
+      return { token, expires_at };
+    }
+    function lockCheck(w, key) {
+      const l = w.locks[key];
+      if (l && l.until && ms(l.until) > nowFn().getTime()) {
+        const mins = Math.ceil((ms(l.until) - nowFn().getTime()) / MIN);
+        return E('LOCKED', 'Too many failed attempts. Try again in ' + mins + ' minute(s).', 429);
+      }
+      return null;
+    }
+    function lockFail(w, key) {
+      const l = w.locks[key] = w.locks[key] || { fails: 0, until: null };
+      if (l.until && ms(l.until) <= nowFn().getTime()) { l.fails = 0; l.until = null; }
+      l.fails += 1;
+      if (l.fails >= 5) { l.until = new Date(nowFn().getTime() + 10 * MIN).toISOString(); l.fails = 0; }
+    }
+    function sessionOk(w, token, scope) {
+      const s = token && w.sessions[token];
+      return !!(s && s.scope === scope && ms(s.expires_at) > nowFn().getTime());
+    }
+    function staffSession(w, token, roles) {
+      const s = token && w.sessions[token];
+      if (!s || s.scope !== 'STAFF' || ms(s.expires_at) <= nowFn().getTime()) throw E('AUTH_REQUIRED', 'Please sign in to the staff console.', 401);
+      if (roles && !roles.includes(s.role)) throw E('FORBIDDEN', 'Your role (' + s.role + ') cannot do this.', 403);
+      return s;
+    }
+    const touch = (s) => { s.expires_at = new Date(nowFn().getTime() + 30 * MIN).toISOString(); };
+
+    // ---------- billing core ----------
+    function validateMeter(w, num) {
+      num = String(num || '').trim();
+      if (!/^\d{11}$/.test(num)) throw E('METER_FORMAT', 'Meter number must be exactly 11 digits.');
+      if (!luhnValid(num)) throw E('METER_CHECKSUM', 'That meter number has an invalid check digit. Please re-check it.');
+      const m = w.meters.find((x) => x.meter_number === num);
+      if (!m) throw E('METER_UNKNOWN', 'No meter with that number is registered.', 404);
+      if (m.status !== 'ACTIVE') throw E('METER_BLOCKED', 'This meter is blocked from vending. Please contact a customer service centre.', 403);
+      return m;
+    }
+    function computeQuote(w, meter, amount, channelId) {
+      const ch = w.config.channels.find((c) => c.id === channelId);
+      if (!ch) throw E('CHANNEL_INVALID', 'Unknown payment channel.');
+      if (!Number.isInteger(amount) || amount <= 0) throw E('AMOUNT_INVALID', 'Enter a valid amount.');
+      if (amount < ch.min_toea) throw E('AMOUNT_LIMIT', 'Minimum for this channel is ' + kina(ch.min_toea) + '.');
+      if (amount > ch.max_toea) throw E('AMOUNT_LIMIT', 'Maximum for this channel is ' + kina(ch.max_toea) + '.');
+      const bp = w.config.gst_bp;
+      const fee = ch.fee_toea + Math.round(amount * (ch.fee_pct || 0));
+      const gst = Math.round(amount * bp / (10000 + bp));
+      const energy = amount - gst;
+      const rate = w.config.tariffs[meter.tariff].rate_toea;
+      const kwh = Math.floor(energy * 100 / rate) / 100;
+      return { amount_toea: amount, gst_toea: gst, energy_toea: energy, fee_toea: fee, total_toea: amount + fee, rate_toea: rate, kwh, channel: ch.id, channel_label: ch.label };
+    }
+    function outstanding(inv) { return inv.amount_toea - inv.paid_toea; }
+    function accountDue(acc) { return acc.invoices.reduce((s, i) => s + outstanding(i), 0); }
+
+    function doCreatePayment(w, input, at) {
+      const key = String(input.idempotency_key || '');
+      if (key.length < 8 || key.length > 64) throw E('IDEM_REQUIRED', 'Missing request key.');
+      const kind = input.kind;
+      const sig = [kind, input.meter_number || input.account, input.amount_toea, input.channel].join('|');
+      if (w.idem[key]) {
+        const ex = w.payments.find((p) => p.id === w.idem[key].payment_id);
+        if (ex && w.idem[key].sig === sig) return ex;
+        throw E('IDEM_MISMATCH', 'This request key was already used for a different request.', 409);
+      }
+      let ref, q, amount;
+      if (kind === 'VEND') {
+        const m = validateMeter(w, input.meter_number);
+        q = computeQuote(w, m, input.amount_toea, input.channel);
+        ref = m.meter_number; amount = q.amount_toea;
+      } else if (kind === 'POSTPAID') {
+        const acc = w.postpaid_accounts.find((a) => a.account === input.account);
+        if (!acc) throw E('ACCOUNT_UNKNOWN', 'Account not found.', 404);
+        const due = accountDue(acc);
+        amount = input.amount_toea;
+        if (!Number.isInteger(amount) || amount < 100) throw E('AMOUNT_INVALID', 'Enter an amount of at least K1.00.');
+        if (due <= 0) throw E('NOTHING_DUE', 'This account has nothing outstanding.');
+        if (amount > due) throw E('OVERPAY', 'Amount exceeds the outstanding balance of ' + kina(due) + '.');
+        const ch = w.config.channels.find((c) => c.id === input.channel);
+        if (!ch) throw E('CHANNEL_INVALID', 'Unknown payment channel.');
+        ref = acc.account;
+        q = { fee_toea: ch.fee_toea + Math.round(amount * (ch.fee_pct || 0)), channel: ch.id };
+      } else throw E('KIND_INVALID', 'Unknown payment type.');
+      const p = {
+        id: 'PAY-' + randFrom(ALPHA32, 10), idem_key: key, kind, ref, amount_toea: amount, fee_toea: q.fee_toea,
+        total_toea: amount + q.fee_toea, channel: q.channel, status: 'PENDING', created_at: at,
+        expires_at: new Date(ms(at) + 15 * MIN).toISOString(), settled_at: null, failure_reason: null, tx_ref: null, alloc: null
+      };
+      w.payments.push(p);
+      w.idem[key] = { payment_id: p.id, sig };
+      audit(w, 'customer', 'PAYMENT_CREATED', p.id, kind + ' ' + ref + ' ' + kina(amount));
+      return p;
+    }
+
+    function uniqueToken(w) {
+      for (let tries = 0; tries < 20; tries++) {
+        const d = randDigits(20);
+        const t = d.match(/.{4}/g).join('-');
+        if (!w.vend_transactions.some((x) => x.token === t)) return t;
+      }
+      throw E('TOKEN_GEN', 'Could not generate a unique token.', 500);
+    }
+
+    // returns {payment, tx?, alloc?}; never throws for business failures after payment exists
+    function doSettle(w, p, at) {
+      if (p.status === 'SETTLED') return { payment: p, tx: w.vend_transactions.find((t) => t.tx_ref === p.tx_ref) || null };
+      if (p.status !== 'PENDING') throw E('INVALID_STATE', 'Payment is ' + p.status.toLowerCase() + ' and cannot be settled.', 409);
+      if (p.kind === 'VEND') {
+        const m = w.meters.find((x) => x.meter_number === p.ref);
+        if (!m || m.status !== 'ACTIVE') {
+          p.status = 'FAILED'; p.failure_reason = 'Meter became unavailable - payment will be refunded (simulated)';
+          audit(w, 'system', 'PAYMENT_FAILED', p.id, p.failure_reason);
+          return { payment: p, tx: null };
+        }
+        const q = computeQuote(w, m, p.amount_toea, p.channel);
+        const tx = {
+          tx_ref: 'TX-' + pad(next(w, 'tx', 884000), 6), payment_id: p.id, meter_number: m.meter_number,
+          amount_toea: q.amount_toea, gst_toea: q.gst_toea, energy_toea: q.energy_toea, rate_toea: q.rate_toea,
+          kwh: q.kwh, token: uniqueToken(w), channel: p.channel, created_at: at
+        };
+        w.vend_transactions.push(tx);
+        m.balance_kwh = Math.round((m.balance_kwh + q.kwh) * 100) / 100;
+        m.credited_kwh_total = Math.round((m.credited_kwh_total + q.kwh) * 100) / 100;
+        p.status = 'SETTLED'; p.settled_at = at; p.tx_ref = tx.tx_ref;
+        audit(w, 'system', 'TOKEN_VENDED', tx.tx_ref, m.meter_number + ' +' + q.kwh + ' kWh');
+        return { payment: p, tx };
+      }
+      const acc = w.postpaid_accounts.find((a) => a.account === p.ref);
+      let left = p.amount_toea; const alloc = [];
+      for (const inv of acc.invoices.slice().sort((a, b) => a.due_date.localeCompare(b.due_date))) {
+        const take = Math.min(left, outstanding(inv));
+        if (take > 0) { inv.paid_toea += take; left -= take; alloc.push({ invoice_id: inv.id, amount_toea: take }); }
+      }
+      p.alloc = alloc; p.status = 'SETTLED'; p.settled_at = at;
+      audit(w, 'system', 'POSTPAID_SETTLED', p.id, acc.account + ' ' + kina(p.amount_toea));
+      return { payment: p, tx: null };
+    }
+
+    // ---------- tickets ----------
+    const norm = (s) => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    function clean(s, max, field, required) {
+      s = String(s == null ? '' : s).replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, '').trim();
+      if (required && s.length < 3) throw E('VALIDATION', field + ' is required.');
+      if (s.length > max) throw E('VALIDATION', field + ' is too long (max ' + max + ' characters).');
+      return s;
+    }
+    const addEvent = (w, t, actor, from, to, note, at) => w.ticket_events.push({
+      id: 'EVT-' + pad(next(w, 'evt'), 6), ticket_id: t.ticket_id, at, actor, from, to, note: note || ''
+    });
+    const isTerminal = (t) => t.stage === 'Cancelled' || t.stage === STAGES[t.kind][STAGES[t.kind].length - 1];
+    const findSuburb = (w, id) => {
+      const s = w.config.suburbs.find((x) => x.id === id);
+      if (!s) throw E('VALIDATION', 'Please choose a suburb / town from the list.');
+      return s;
+    };
+    function pickCrew(w, kind, grid) {
+      const type = kind === 'TIP' ? 'RPU' : 'LINE';
+      const load = (c) => w.tickets.filter((t) => t.assigned_crew === c.name && !isTerminal(t)).length;
+      const pool = w.config.crews.filter((c) => c.type === type);
+      const local = pool.filter((c) => c.grid === grid);
+      return (local.length ? local : pool).sort((a, b) => load(a) - load(b))[0].name;
+    }
+    function doAdvance(w, t, actor, note, at) {
+      const stages = STAGES[t.kind], idx = stages.indexOf(t.stage);
+      if (idx < 0 || idx === stages.length - 1) throw E('INVALID_TRANSITION', t.ticket_id + ' is already ' + t.stage + '.', 409);
+      const to = stages[idx + 1];
+      if (to === 'Crew Dispatched' || to === 'Field Audit') t.assigned_crew = pickCrew(w, t.kind, t.grid);
+      addEvent(w, t, actor, t.stage, to, note, at);
+      t.stage = to; t.updated_at = at;
+    }
+    function doCreateFault(w, input, at, actor) {
+      const cat = FAULT_CATS[input.category];
+      if (!cat) throw E('VALIDATION', 'Choose a fault type.');
+      const sub = findSuburb(w, input.suburb_id);
+      const address = clean(input.address_text, 160, 'Address / landmark', cat.group === 'PREMISES');
+      const details = clean(input.details, 300, 'Details');
+      const tag = String(input.pole_tag || '').trim().toUpperCase();
+      let lat = sub.lat, lng = sub.lng, poleKnown = false, note = '';
+      if (tag) {
+        if (!POLE_RE.test(tag)) throw E('VALIDATION', 'Pole tag format looks like POM-A12-04.');
+        const pole = w.config.poles.find((p) => p.tag === tag);
+        if (pole) { lat = pole.lat; lng = pole.lng; poleKnown = true; if (pole.suburb !== sub.id) note = 'Pole tag is registered in another suburb; location taken from the pole.'; }
+        else note = 'Pole tag not in registry; location approximated from the suburb.';
+      }
+      const open = w.tickets.filter((t) => t.kind === 'FAULT' && !isTerminal(t) && t.group === cat.group && t.grid === sub.grid);
+      let match = null, dist = null;
+      if (cat.group === 'PREMISES') {
+        match = open.find((t) => t.suburb_id === sub.id && norm(t.address_text) === norm(address)) || null;
+        dist = match ? 0 : null;
+      } else {
+        for (const t of open) {
+          const d = haversineM(lat, lng, t.lat, t.lng);
+          if (d <= 500 && (dist === null || d < dist)) { match = t; dist = d; }
+        }
+      }
+      if (match) {
+        match.reports.push({ at, note: details });
+        match.updated_at = at;
+        addEvent(w, match, actor, match.stage, match.stage, 'Additional report attached (' + Math.round(dist) + ' m from original)', at);
+        return { ticket: match, deduplicated: true, distance_m: Math.round(dist), pole_known: poleKnown, note };
+      }
+      let nearby = null;
+      if (cat.group === 'PREMISES') {
+        nearby = w.tickets.find((t) => t.kind === 'FAULT' && !isTerminal(t) && t.group === 'AREA' && t.grid === sub.grid && haversineM(lat, lng, t.lat, t.lng) <= 500) || null;
+      }
+      const t = {
+        ticket_id: 'FLT-' + pad(next(w, 'flt', 10000), 5), kind: 'FAULT', group: cat.group, category: input.category,
+        priority: cat.priority, grid: sub.grid, suburb_id: sub.id, lat, lng, pole_tag: tag || '', address_text: address,
+        details, stage: 'Logged', assigned_crew: '', reports: [{ at, note: details }], created_at: at, updated_at: at, notes: note
+      };
+      w.tickets.push(t);
+      addEvent(w, t, actor, null, 'Logged', 'Ticket created', at);
+      if (cat.priority === 'P1') doAdvance(w, t, 'system', 'Auto-verified: P1 hazard', at);
+      audit(w, actor, 'FAULT_CREATED', t.ticket_id, cat.priority + ' ' + sub.name);
+      return { ticket: t, deduplicated: false, distance_m: null, pole_known: poleKnown, note, nearby_area_outage: nearby ? nearby.ticket_id : null };
+    }
+    function doCreateTip(w, input, at, fixedCode) {
+      if (!TIP_CATS[input.category]) throw E('VALIDATION', 'Choose an offence category.');
+      const sub = findSuburb(w, input.suburb_id);
+      const t = {
+        ticket_id: 'RPU-' + pad(next(w, 'rpu', 10000), 5), kind: 'TIP', group: 'TIP', category: input.category, priority: 'P3',
+        grid: sub.grid, suburb_id: sub.id, lat: sub.lat, lng: sub.lng, pole_tag: '',
+        address_text: clean(input.address_text, 160, 'Address / landmark', true), details: clean(input.details, 300, 'Details'),
+        stage: 'Received', assigned_crew: '', reports: [], created_at: at, updated_at: at, notes: '',
+        access_code: fixedCode || randFrom(ALPHA32, 6)
+      };
+      w.tickets.push(t);
+      addEvent(w, t, 'reporter', null, 'Received', 'Tip received', at);
+      audit(w, 'reporter', 'TIP_CREATED', t.ticket_id, sub.name);
+      return t;
+    }
+
+    // ---------- grid simulation ----------
+    function localHour(date) { return ((date.getUTCHours() + 10) % 24) + date.getUTCMinutes() / 60; }
+    function loadMw(w, key, date) {
+      const g = w.grid[key], h = localHour(date), t = date.getTime();
+      const shape = 0.7 + 0.3 * Math.exp(-((h - 19) ** 2) / 8) + 0.12 * Math.exp(-((h - 12) ** 2) / 20);
+      const noise = 1 + 0.012 * Math.sin(t / 7000) + 0.008 * Math.sin(t / 3100);
+      const shed = g.override === 'Feeder Load Shedding' ? 0.85 : 1;
+      return Math.round(Math.min(g.capacity_mw, g.base_mw * shape * noise * shed) * 10) / 10;
+    }
+    function gridStatus(w, key) {
+      const g = w.grid[key];
+      if (g.override) return { status: g.override, source: 'Control room override' };
+      const p1 = w.tickets.filter((t) => t.kind === 'FAULT' && t.priority === 'P1' && t.grid === key && !isTerminal(t)).length;
+      if (p1 > 0) return { status: 'Degraded - hazard reports open', source: 'Automatic: ' + p1 + ' open P1 ticket(s)' };
+      return { status: 'Normal Operation', source: 'Automatic: no open hazards' };
+    }
+    function ledFor(m) {
+      const days = m.daily_kwh > 0 ? m.balance_kwh / m.daily_kwh : Infinity;
+      let state = 'green', label = 'Solid green - sufficient credit';
+      if (m.balance_kwh <= 0) { state = 'none'; label = 'No credit - supply cut'; }
+      else if (days < 3) { state = 'red'; label = 'Flashing red - about ' + Math.max(1, Math.round(days)) + ' day(s) left'; }
+      else if (days <= 7) { state = 'amber'; label = 'Solid amber - about ' + Math.round(days) + ' days left'; }
+      return { state, label, days_left: isFinite(days) ? Math.round(days * 10) / 10 : null };
+    }
+
+    // ---------- seed ----------
+    function seedDb() {
+      const t0 = nowFn().getTime();
+      const ago = (min) => new Date(t0 - min * MIN).toISOString();
+      const now = ago(0);
+      const w = {
+        meta: { schema: SCHEMA_VERSION, rev: 0, created_at: now, updated_at: now },
+        counters: {}, payments: [], vend_transactions: [], tickets: [], ticket_events: [], audit: [], sessions: {}, locks: {}, idem: {},
+        brand: { name: 'Demo Utility', tagline: 'Customer & Dispatch Portal', hotline: '0000 0000 (demo)', color: '#0f5f73' },
+        config: {
+          gst_bp: 1000, show_demo_credentials: true, tz: TZ, channels: CHANNELS, crews: CREWS, offices: OFFICES,
+          tariffs: { DOM: { label: 'Domestic (demo rate)', rate_toea: 82 }, COM: { label: 'Commercial (demo rate)', rate_toea: 108 } },
+          suburbs: SUBURBS, grids: GRIDS, fault_cats: FAULT_CATS, tip_cats: TIP_CATS, target_min: TARGET_MIN,
+          poles: POLE_SEEDS.map(([tag, sid, dx, dy]) => {
+            const s = SUBURBS.find((x) => x.id === sid);
+            return Object.assign({ tag, suburb: sid }, offsetLatLng(s.lat, s.lng, dx, dy));
+          }),
+          demo_credentials: {}
+        },
+        meters: [], postpaid_accounts: [], notices: [],
+        grid: {}, staff: []
+      };
+      Object.keys(GRIDS).forEach((k) => { w.grid[k] = { override: null, base_mw: GRIDS[k].base_mw, capacity_mw: GRIDS[k].capacity_mw }; });
+      const mk = (base, holder, tariff, feeder, grid, status, pin, daily, bal) => {
+        const num = base + luhnCheckDigit(base);
+        w.meters.push({ meter_number: num, holder, tariff, feeder, grid, status, pin_hash: hashSecret(pin, num), daily_kwh: daily, balance_kwh: bal, credited_kwh_total: 0 });
+        (w.config.demo_credentials.meters = w.config.demo_credentials.meters || []).push({ meter_number: num, pin, label: holder + (status !== 'ACTIVE' ? ' (blocked)' : '') });
+        return num;
+      };
+      const m1 = mk('0428194021', 'Sample Household A', 'DOM', 'Hohola 11 kV Feeder 04', 'capital', 'ACTIVE', '1234', 9, 0);
+      const m2 = mk('0719402883', 'Sample Bakery Ltd', 'COM', 'Boroko 11 kV Commercial', 'capital', 'ACTIVE', '2345', 25, 100);
+      mk('0491028374', 'Sample Household B', 'DOM', 'Lae 11 kV Feeder 02', 'highlands', 'ACTIVE', '3456', 9, 6);
+      mk('0555123400', 'Sample Blocked Meter', 'DOM', 'Hohola 11 kV Feeder 04', 'capital', 'SUSPENDED', '4567', 9, 0);
+      const due = new Date(t0 + 11 * 86400000).toISOString().slice(0, 10);
+      const period = new Date(t0 - 30 * 86400000).toLocaleString('en-GB', { month: 'short', year: 'numeric', timeZone: TZ });
+      w.postpaid_accounts.push({
+        account: 'ACC-DEMO-0001', holder: 'Sample Commercial Customer Ltd', pin_hash: hashSecret('5678', 'ACC-DEMO-0001'),
+        invoices: [{ id: 'INV-' + period.replace(' ', '-').toUpperCase(), period, due_date: due, amount_toea: 48560, paid_toea: 0 }]
+      });
+      w.config.demo_credentials.account = { account: 'ACC-DEMO-0001', pin: '5678' };
+      const staffs = [['dispatcher', 'dispatch123', 'dispatcher'], ['supervisor', 'super123', 'supervisor']];
+      staffs.forEach(([user, pw, role]) => w.staff.push({ user, role, hash: hashSecret(pw, 'staff:' + user) }));
+      w.config.demo_credentials.staff = staffs.map(([user, password, role]) => ({ user, password, role }));
+      // seeded history goes through the same code paths as live traffic
+      const seedPay = (meter, amount, ch, min) => {
+        const at = ago(min);
+        const p = doCreatePayment(w, { kind: 'VEND', meter_number: meter, amount_toea: amount, channel: ch, idempotency_key: 'seed-' + meter + '-' + min }, at);
+        doSettle(w, p, at);
+      };
+      seedPay(m2, 20000, 'bank_ussd', 1500);
+      seedPay(m1, 5000, 'wallet', 600);
+      const f1 = doCreateFault(w, { category: 'AREA_BLACKOUT', suburb_id: 'waigani', pole_tag: 'POM-A12-04', details: 'Whole street dark since morning' }, ago(150), 'seed').ticket;
+      doAdvance(w, f1, 'dispatcher', 'Verified by phone', ago(130));
+      doAdvance(w, f1, 'dispatcher', 'Crew en route', ago(100));
+      const f2 = doCreateFault(w, { category: 'HAZARD', suburb_id: 'boroko', details: 'Low wire after storm' }, ago(1700), 'seed').ticket;
+      ['x', 'x', 'x', 'x'].forEach((_, i) => { if (!isTerminal(f2)) doAdvance(w, f2, 'dispatcher', i === 3 ? 'Repaired' : '', ago(1700 - 30 * (i + 1))); });
+      const tip = doCreateTip(w, { category: 'HOOKUP', suburb_id: 'gerehu', address_text: 'Behind the market, near pole POM-G2-09', details: 'Visible direct wire from the pole' }, ago(900), 'DEMO42');
+      doAdvance(w, tip, 'supervisor', 'Assigned for review', ago(800));
+      w.notices.push(
+        { id: 'N1', category: 'Planned Outages', posted_at: ago(300), region: 'Capital Grid', title: 'Planned feeder maintenance: Boroko and Waigani corridors',
+          summary: 'Sample notice: switchgear replacement scheduled for tomorrow morning.',
+          body: ['This is a SAMPLE notice for the demo. A short interruption is scheduled for parts of Boroko and Waigani tomorrow between 8:00 and 14:00.', 'Treat all powerlines as live at all times, including during maintenance windows.'] },
+        { id: 'N2', category: 'Safety & Compliance', posted_at: ago(4000), region: 'All areas', title: 'Stay 10 metres away from fallen powerlines',
+          summary: 'Sample safety notice: report hazards immediately and report illegal connections confidentially.',
+          body: ['SAMPLE safety notice. Keep at least 10 metres away from any fallen line or sparking transformer and call the hotline immediately.', 'Illegal connections and meter tampering can be reported confidentially through the portal.'] },
+        { id: 'N3', category: 'Corporate News', posted_at: ago(9000), region: 'Highlands & Provincial', title: 'Substation relay upgrades and solar-hybrid expansion update',
+          summary: 'Sample corporate news item to show how notices appear.', body: ['SAMPLE news item. Replace with real corporate communications.'] }
+      );
+      audit(w, 'system', 'SEED', 'db', 'Demo database created');
+      return w;
+    }
+
+    // =====================================================================
+    // PUBLIC API
+    // =====================================================================
+    const effStatus = (p) => (p.status === 'PENDING' && ms(p.expires_at) <= nowFn().getTime() ? 'EXPIRED' : p.status);
+    function pubPayment(w, p) {
+      const ch = w.config.channels.find((c) => c.id === p.channel);
+      return {
+        id: p.id, kind: p.kind, status: effStatus(p), ref: p.ref, amount_toea: p.amount_toea, fee_toea: p.fee_toea,
+        total_toea: p.total_toea, channel: p.channel, channel_label: ch ? ch.label : p.channel, created_at: p.created_at,
+        expires_at: p.expires_at, settled_at: p.settled_at, failure_reason: p.failure_reason, tx_ref: p.tx_ref, alloc: p.alloc
+      };
+    }
+    function receipt(w, res) {
+      const out = { payment: pubPayment(w, res.payment), tx: null };
+      if (res.tx) {
+        out.tx = { tx_ref: res.tx.tx_ref, meter_number: res.tx.meter_number, token: res.tx.token, kwh: res.tx.kwh,
+          amount_toea: res.tx.amount_toea, gst_toea: res.tx.gst_toea, energy_toea: res.tx.energy_toea, created_at: res.tx.created_at };
+        const m = w.meters.find((x) => x.meter_number === res.tx.meter_number);
+        out.meter_led = ledFor(m);
+      }
+      return out;
+    }
+    const findPayment = (w, id) => {
+      const p = w.payments.find((x) => x.id === id);
+      if (!p) throw E('NOT_FOUND', 'Payment not found.', 404);
+      return p;
+    };
+    function pubTicket(w, t) {
+      const sub = w.config.suburbs.find((s) => s.id === t.suburb_id);
+      const stages = STAGES[t.kind];
+      const idx = stages.indexOf(t.stage);
+      const timeline = w.ticket_events.filter((e) => e.ticket_id === t.ticket_id && e.to !== e.from).map((e) => ({ at: e.at, stage: e.to }));
+      const out = {
+        ticket_id: t.ticket_id, kind: t.kind, stage: t.stage, stages, stage_index: idx, priority: t.kind === 'FAULT' ? t.priority : null,
+        suburb_name: sub ? sub.name : '', grid_name: w.config.grids[t.grid].name, created_at: t.created_at, updated_at: t.updated_at,
+        timeline, terminal: isTerminal(t)
+      };
+      if (t.kind === 'FAULT') {
+        out.category_label = w.config.fault_cats[t.category].label; out.reports = t.reports.length; out.pole_tag = t.pole_tag;
+        out.crew = idx >= 2 ? t.assigned_crew : '';
+      } else out.category_label = 'Confidential report';
+      return out;
+    }
+
+    const api = {
+      on(fn) { listeners.push(fn); return () => { const i = listeners.indexOf(fn); if (i >= 0) listeners.splice(i, 1); }; },
+      reload() { refresh(); emit(); },
+      health() {
+        const d = read();
+        return { persistent: storage.persistent, rev: d.meta.rev, updated_at: d.meta.updated_at, bytes: (lastRaw || '').length, schema: d.meta.schema };
+      },
+      getBrand() { return clone(read().brand); },
+      getConfig() {
+        const c = read().config;
+        return clone({ channels: c.channels, suburbs: c.suburbs, grids: c.grids, fault_cats: c.fault_cats, tip_cats: c.tip_cats, tariffs: c.tariffs, offices: c.offices, target_min: c.target_min, gst_bp: c.gst_bp, poles: c.poles.map((p) => ({ tag: p.tag, suburb: p.suburb })) });
+      },
+      demoCredentials() { const c = read().config; return c.show_demo_credentials ? clone(c.demo_credentials) : null; },
+      getStats() {
+        const d = read();
+        const open = d.tickets.filter((t) => t.kind === 'FAULT' && !isTerminal(t));
+        return {
+          tokens: d.vend_transactions.length, kwh: Math.round(d.vend_transactions.reduce((s, t) => s + t.kwh, 0) * 100) / 100,
+          open_faults: open.length, open_p1: open.filter((t) => t.priority === 'P1').length
+        };
+      },
+      lookupMeter(num) {
+        const d = read();
+        const m = validateMeter(Object.assign({}, d, {}), num);
+        const mask = (s) => s.split(' ').map((x) => x[0] + '***').join(' ');
+        const tar = d.config.tariffs[m.tariff];
+        return { meter_number: m.meter_number, holder_masked: mask(m.holder), tariff_label: tar.label, rate_toea: tar.rate_toea, feeder: m.feeder, led: ledFor(m) };
+      },
+      quote(input) {
+        const d = read();
+        const m = validateMeter(d, input.meter_number);
+        return computeQuote(d, m, input.amount_toea, input.channel);
+      },
+      createPayment(input) {
+        if (input.kind === 'POSTPAID') {
+          const d = read();
+          if (!sessionOk(d, input.auth_token, 'ACC:' + input.account)) throw E('AUTH_REQUIRED', 'Please unlock the account with its PIN first.', 401);
+        }
+        return transact((w) => pubPayment(w, doCreatePayment(w, input, iso())));
+      },
+      getPayment(id) { const d = read(); return pubPayment(d, findPayment(d, id)); },
+      gatewayRespond(id, outcome) {
+        return transact((w) => {
+          const p = findPayment(w, id);
+          if (p.status === 'SETTLED') return receipt(w, doSettle(w, p, iso()));
+          if (p.status !== 'PENDING') throw E('INVALID_STATE', 'This payment is ' + p.status.toLowerCase() + '. Please start a new purchase.', 409);
+          if (outcome === 'approve') return receipt(w, doSettle(w, p, iso()));
+          if (outcome === 'decline') {
+            p.status = 'FAILED'; p.failure_reason = 'Declined by the payment provider (simulated: insufficient funds)';
+            audit(w, 'gateway', 'PAYMENT_DECLINED', p.id, p.ref);
+            return receipt(w, { payment: p });
+          }
+          if (outcome === 'noresponse') { audit(w, 'gateway', 'PAYMENT_NO_RESPONSE', p.id, p.ref); return receipt(w, { payment: p }); }
+          throw E('VALIDATION', 'Unknown gateway outcome.');
+        });
+      },
+      // simulates the provider's late "payment confirmed" callback / status query
+      reconcilePayment(id) {
+        return transact((w) => {
+          const p = findPayment(w, id);
+          if (p.status === 'SETTLED') return receipt(w, doSettle(w, p, iso()));
+          if (p.status !== 'PENDING') return { __err: E('INVALID_STATE', 'This payment ' + (p.status === 'EXPIRED' ? 'expired before it was confirmed. No money was taken (simulated).' : 'failed: ' + (p.failure_reason || '')), 409) };
+          return receipt(w, doSettle(w, p, iso()));
+        });
+      },
+      verifyMeter(num, pin) { return verifySubject('METER', String(num || '').trim(), pin); },
+      verifyAccount(acc, pin) { return verifySubject('ACC', String(acc || '').trim(), pin); },
+      listVendHistory(input) {
+        const d = read();
+        const num = String(input.meter_number || '').trim();
+        const staff = input.auth_token && d.sessions[input.auth_token] && d.sessions[input.auth_token].scope === 'STAFF' && sessionOk(d, input.auth_token, 'STAFF');
+        if (!staff && !sessionOk(d, input.auth_token, 'METER:' + num)) throw E('AUTH_REQUIRED', 'Enter the meter PIN to view token history.', 401);
+        const m = d.meters.find((x) => x.meter_number === num);
+        if (!m) throw E('METER_UNKNOWN', 'No meter with that number is registered.', 404);
+        return {
+          meter: api.lookupMeter(num),
+          transactions: d.vend_transactions.filter((t) => t.meter_number === num).sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 50).map(clone),
+          payments: d.payments.filter((p) => p.kind === 'VEND' && p.ref === num && effStatus(p) !== 'SETTLED').sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 10).map((p) => pubPayment(d, p))
+        };
+      },
+      getStatement(input) {
+        const d = read();
+        if (!sessionOk(d, input.auth_token, 'ACC:' + input.account)) throw E('AUTH_REQUIRED', 'Enter the account PIN to view the statement.', 401);
+        const a = d.postpaid_accounts.find((x) => x.account === input.account);
+        if (!a) throw E('ACCOUNT_UNKNOWN', 'Account not found.', 404);
+        return {
+          account: a.account, holder: a.holder, total_due_toea: accountDue(a),
+          invoices: a.invoices.map((i) => Object.assign(clone(i), { outstanding_toea: outstanding(i) })),
+          payments: d.payments.filter((p) => p.kind === 'POSTPAID' && p.ref === a.account).sort((x, y) => y.created_at.localeCompare(x.created_at)).slice(0, 10).map((p) => pubPayment(d, p))
+        };
+      },
+      createFault(input) {
+        return transact((w) => {
+          const key = String(input.idempotency_key || '');
+          if (key.length < 8) throw E('IDEM_REQUIRED', 'Missing request key.');
+          const hit = w.idem['T:' + key];
+          if (hit) { const t = w.tickets.find((x) => x.ticket_id === hit.ticket_id); return { ticket: pubTicket(w, t), deduplicated: hit.dedup, distance_m: hit.distance_m, replay: true }; }
+          const r = doCreateFault(w, input, iso(), 'customer');
+          w.idem['T:' + key] = { ticket_id: r.ticket.ticket_id, dedup: r.deduplicated, distance_m: r.distance_m };
+          return { ticket: pubTicket(w, r.ticket), deduplicated: r.deduplicated, distance_m: r.distance_m, note: r.note, nearby_area_outage: r.nearby_area_outage || null };
+        });
+      },
+      createTip(input) {
+        return transact((w) => {
+          const key = String(input.idempotency_key || '');
+          if (key.length < 8) throw E('IDEM_REQUIRED', 'Missing request key.');
+          const hit = w.idem['T:' + key];
+          if (hit) { const t = w.tickets.find((x) => x.ticket_id === hit.ticket_id); return { ticket_id: t.ticket_id, access_code: t.access_code, replay: true }; }
+          const t = doCreateTip(w, input, iso());
+          w.idem['T:' + key] = { ticket_id: t.ticket_id };
+          return { ticket_id: t.ticket_id, access_code: t.access_code };
+        });
+      },
+      trackTicket(input) {
+        const d = read();
+        const id = String(input.ticket_id || '').trim().toUpperCase();
+        const t = d.tickets.find((x) => x.ticket_id === id);
+        const nf = E('NOT_FOUND', 'No ticket found. For confidential reports, enter the access code you were given.', 404);
+        if (!t) throw nf;
+        if (t.kind === 'TIP' && String(input.access_code || '').trim().toUpperCase() !== t.access_code) throw nf;
+        return pubTicket(d, t);
+      },
+      searchFaults(input) {
+        const d = read();
+        const q = norm(input && input.q);
+        const day = nowFn().getTime() - 86400000;
+        return d.tickets.filter((t) => t.kind === 'FAULT' && (!isTerminal(t) || ms(t.updated_at) > day)).map((t) => pubTicket(d, t))
+          .filter((t) => !q || norm([t.ticket_id, t.suburb_name, t.pole_tag, t.category_label, t.grid_name].join(' ')).includes(q))
+          .sort((a, b) => (a.terminal - b.terminal) || a.priority.localeCompare(b.priority) || b.created_at.localeCompare(a.created_at)).slice(0, 30);
+      },
+      getGrid() {
+        const d = read(), now = nowFn();
+        return Object.keys(d.config.grids).map((k) => {
+          const meta = d.config.grids[k], st = gridStatus(d, k);
+          const open = d.tickets.filter((t) => t.kind === 'FAULT' && t.grid === k && !isTerminal(t));
+          return Object.assign({ key: k, status: st.status, source: st.source, load_mw: loadMw(d, k, now), open_faults: open.length, open_p1: open.filter((t) => t.priority === 'P1').length }, clone(meta));
+        });
+      },
+      listNotices() { return clone(read().notices).sort((a, b) => b.posted_at.localeCompare(a.posted_at)); },
+      listOffices() { return clone(read().config.offices); }
+    };
+
+    function verifySubject(kind, id, pin) {
+      return transact((w) => {
+        const key = kind + ':' + id;
+        const locked = lockCheck(w, key);
+        if (locked) return { __err: locked };
+        const rec = kind === 'METER' ? w.meters.find((m) => m.meter_number === id) : w.postpaid_accounts.find((a) => a.account === id);
+        if (!rec || rec.pin_hash !== hashSecret(String(pin || ''), id)) {
+          lockFail(w, key);
+          return { __err: E('BAD_CREDENTIALS', 'Incorrect number or PIN.', 401) };
+        }
+        delete w.locks[key];
+        const s = makeSession(w, key, {}, 15);
+        return { auth_token: s.token, expires_at: s.expires_at };
+      });
+    }
+
+    // ---------- staff API ----------
+    function staffTicketView(w, t) {
+      const target = w.config.target_min[t.priority];
+      const age = Math.round((nowFn().getTime() - ms(t.created_at)) / MIN);
+      const stages = STAGES[t.kind], idx = stages.indexOf(t.stage);
+      const sub = w.config.suburbs.find((s) => s.id === t.suburb_id);
+      return Object.assign(clone(t), {
+        suburb_name: sub ? sub.name : '', grid_name: w.config.grids[t.grid].name, age_min: age, terminal: isTerminal(t),
+        next_stage: isTerminal(t) ? null : stages[idx + 1], stages, stage_index: idx,
+        category_label: t.kind === 'FAULT' ? w.config.fault_cats[t.category].label : w.config.tip_cats[t.category],
+        overdue: t.kind === 'FAULT' && !isTerminal(t) && idx < 2 && age > target,
+        events: w.ticket_events.filter((e) => e.ticket_id === t.ticket_id)
+      });
+    }
+    const redactMeter = (m) => { const c = clone(m); c.pin_hash = '[hidden]'; return c; };
+
+    Object.assign(api, {
+      login(user, password) {
+        return transact((w) => {
+          const key = 'STAFF:' + String(user || '').toLowerCase();
+          const locked = lockCheck(w, key);
+          if (locked) return { __err: locked };
+          const s = w.staff.find((x) => x.user === String(user || '').toLowerCase());
+          if (!s || s.hash !== hashSecret(String(password || ''), 'staff:' + s.user)) {
+            lockFail(w, key); audit(w, String(user || '?').slice(0, 30), 'LOGIN_FAILED', 'staff', '');
+            return { __err: E('BAD_CREDENTIALS', 'Incorrect username or password.', 401) };
+          }
+          delete w.locks[key];
+          const sess = makeSession(w, 'STAFF', { user: s.user, role: s.role }, 30);
+          audit(w, s.user, 'LOGIN', 'staff', s.role);
+          return { token: sess.token, user: s.user, role: s.role, expires_at: sess.expires_at };
+        });
+      },
+      logout(token) { return transact((w) => { const s = w.sessions[token]; if (s) { audit(w, s.user, 'LOGOUT', 'staff', ''); delete w.sessions[token]; } return true; }); },
+      whoami(token) { const d = read(); const s = staffSession(d, token); return { user: s.user, role: s.role, expires_at: s.expires_at }; },
+      staffTickets(token, filter) {
+        const d = read(); staffSession(d, token);
+        filter = filter || {};
+        const rank = { P1: 0, P2: 1, P3: 2 };
+        return d.tickets.filter((t) => (!filter.kind || t.kind === filter.kind) && (filter.status === 'all' || !isTerminal(t)))
+          .map((t) => staffTicketView(d, t))
+          .sort((a, b) => (a.terminal - b.terminal) || (rank[a.priority] - rank[b.priority]) || a.created_at.localeCompare(b.created_at));
+      },
+      advanceTicket(token, id, note) {
+        return transact((w) => {
+          const s = staffSession(w, token, ['dispatcher', 'supervisor']); touch(s);
+          const t = w.tickets.find((x) => x.ticket_id === id);
+          if (!t) throw E('NOT_FOUND', 'Ticket not found.', 404);
+          doAdvance(w, t, s.user, clean(note, 200, 'Note'), iso());
+          audit(w, s.user, 'TICKET_ADVANCED', id, t.stage);
+          return staffTicketView(w, t);
+        });
+      },
+      cancelTicket(token, id, reason) {
+        return transact((w) => {
+          const s = staffSession(w, token, ['dispatcher', 'supervisor']); touch(s);
+          const t = w.tickets.find((x) => x.ticket_id === id);
+          if (!t) throw E('NOT_FOUND', 'Ticket not found.', 404);
+          if (isTerminal(t)) throw E('INVALID_TRANSITION', id + ' is already ' + t.stage + '.', 409);
+          const r = clean(reason, 200, 'A reason', true);
+          addEvent(w, t, s.user, t.stage, 'Cancelled', r, iso());
+          t.stage = 'Cancelled'; t.updated_at = iso();
+          audit(w, s.user, 'TICKET_CANCELLED', id, r);
+          return staffTicketView(w, t);
+        });
+      },
+      setGridOverride(token, grid, status) {
+        return transact((w) => {
+          const s = staffSession(w, token, ['supervisor']); touch(s);
+          if (!w.grid[grid]) throw E('NOT_FOUND', 'Unknown grid.', 404);
+          if (status && !['Scheduled Inspection', 'Feeder Load Shedding'].includes(status)) throw E('VALIDATION', 'Invalid status.');
+          w.grid[grid].override = status || null;
+          audit(w, s.user, 'GRID_OVERRIDE', grid, status || 'cleared (automatic)');
+          return true;
+        });
+      },
+      postNotice(token, input) {
+        return transact((w) => {
+          const s = staffSession(w, token, ['supervisor']); touch(s);
+          const cats = ['Planned Outages', 'Safety & Compliance', 'Corporate News'];
+          if (!cats.includes(input.category)) throw E('VALIDATION', 'Choose a category.');
+          const n = {
+            id: 'N' + next(w, 'notice', 100), category: input.category, posted_at: iso(), region: clean(input.region, 80, 'Region', true),
+            title: clean(input.title, 120, 'Title', true), summary: clean(input.summary, 200, 'Summary', true), body: [clean(input.body || input.summary, 1200, 'Body', true)]
+          };
+          w.notices.push(n); audit(w, s.user, 'NOTICE_POSTED', n.id, n.title);
+          return n;
+        });
+      },
+      deleteNotice(token, id) {
+        return transact((w) => {
+          const s = staffSession(w, token, ['supervisor']); touch(s);
+          const i = w.notices.findIndex((n) => n.id === id);
+          if (i < 0) throw E('NOT_FOUND', 'Notice not found.', 404);
+          w.notices.splice(i, 1); audit(w, s.user, 'NOTICE_DELETED', id, '');
+          return true;
+        });
+      },
+      listPayments(token) {
+        const d = read(); staffSession(d, token);
+        return d.payments.slice().sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 100).map((p) => pubPayment(d, p));
+      },
+      financeReport(token) {
+        const d = read(); staffSession(d, token);
+        const sum = (arr, f) => arr.reduce((s, x) => s + f(x), 0);
+        const txBy = {}; d.vend_transactions.forEach((t) => { txBy[t.tx_ref] = t; });
+        const payBy = {}; d.payments.forEach((p) => { payBy[p.id] = p; });
+        const settledV = d.payments.filter((p) => p.kind === 'VEND' && p.status === 'SETTLED');
+        const settledP = d.payments.filter((p) => p.kind === 'POSTPAID' && p.status === 'SETTLED');
+        const anomalies = [];
+        settledV.forEach((p) => { if (!txBy[p.tx_ref]) anomalies.push('Settled payment ' + p.id + ' has no token record'); });
+        const seen = new Set();
+        d.vend_transactions.forEach((t) => {
+          const p = payBy[t.payment_id];
+          if (!p || p.status !== 'SETTLED') anomalies.push(t.tx_ref + ' has no settled payment');
+          if (t.energy_toea + t.gst_toea !== t.amount_toea) anomalies.push(t.tx_ref + ': energy + GST does not equal amount');
+          if (seen.has(t.token)) anomalies.push(t.tx_ref + ': duplicate token'); seen.add(t.token);
+        });
+        d.meters.forEach((m) => {
+          const k = sum(d.vend_transactions.filter((t) => t.meter_number === m.meter_number), (t) => t.kwh);
+          if (Math.abs(k - m.credited_kwh_total) > 0.005) anomalies.push('Meter ' + m.meter_number + ': credited kWh does not match token ledger');
+        });
+        d.postpaid_accounts.forEach((a) => a.invoices.forEach((inv) => {
+          const paid = sum(settledP.filter((p) => p.ref === a.account), (p) => sum((p.alloc || []).filter((x) => x.invoice_id === inv.id), (x) => x.amount_toea));
+          if (paid !== inv.paid_toea) anomalies.push('Invoice ' + inv.id + ': paid amount does not match payment allocations');
+        }));
+        const by = (st) => d.payments.filter((p) => effStatus(p) === st);
+        return {
+          vend: { count: settledV.length, amount_toea: sum(settledV, (p) => p.amount_toea), gst_toea: sum(d.vend_transactions, (t) => t.gst_toea), fees_toea: sum(settledV, (p) => p.fee_toea), kwh: Math.round(sum(d.vend_transactions, (t) => t.kwh) * 100) / 100 },
+          postpaid: { count: settledP.length, amount_toea: sum(settledP, (p) => p.amount_toea) },
+          pending: { count: by('PENDING').length, amount_toea: sum(by('PENDING'), (p) => p.total_toea) },
+          failed: { count: by('FAILED').length }, expired: { count: by('EXPIRED').length },
+          anomalies
+        };
+      },
+      auditLog(token) { const d = read(); staffSession(d, token, ['supervisor']); return clone(d.audit).reverse().slice(0, 200); },
+      inspectTable(token, name) {
+        const d = read(); staffSession(d, token, ['supervisor']);
+        const tables = {
+          meters: () => d.meters.map(redactMeter), vend_transactions: () => d.vend_transactions, payments: () => d.payments.map((p) => Object.assign({}, p, { idem_key: '[hidden]' })),
+          tickets: () => d.tickets, ticket_events: () => d.ticket_events, grid: () => d.grid, notices: () => d.notices
+        };
+        if (!tables[name]) throw E('NOT_FOUND', 'Unknown table.', 404);
+        return clone(tables[name]());
+      },
+      updateBrand(token, input) {
+        return transact((w) => {
+          const s = staffSession(w, token, ['supervisor']); touch(s);
+          const color = String(input.color || '').trim();
+          if (!/^#[0-9a-fA-F]{6}$/.test(color)) throw E('VALIDATION', 'Colour must be a hex value like #0f5f73.');
+          w.brand = { name: clean(input.name, 40, 'Utility name', true), tagline: clean(input.tagline, 60, 'Tagline', true), hotline: clean(input.hotline, 40, 'Hotline', true), color };
+          audit(w, s.user, 'BRAND_UPDATED', 'brand', w.brand.name);
+          return clone(w.brand);
+        });
+      },
+      setDemoCredentialsVisible(token, on) {
+        return transact((w) => { const s = staffSession(w, token, ['supervisor']); touch(s); w.config.show_demo_credentials = !!on; audit(w, s.user, 'DEMO_CREDS', 'config', on ? 'shown' : 'hidden'); return true; });
+      },
+      exportDb(token) {
+        const d = read(); staffSession(d, token, ['supervisor']);
+        const c = clone(d); c.sessions = {}; c.idem = {}; c.locks = {}; c.staff = c.staff.map((x) => ({ user: x.user, role: x.role }));
+        c.meters = c.meters.map(redactMeter); c.postpaid_accounts.forEach((a) => { a.pin_hash = '[hidden]'; }); c.config.demo_credentials = {};
+        return JSON.stringify(c, null, 2);
+      },
+      resetDemo(token) {
+        refresh();
+        const s0 = staffSession(db, token, ['supervisor']);
+        const fresh = seedDb();
+        fresh.sessions[token] = Object.assign({}, db.sessions[token]);
+        fresh.config.show_demo_credentials = db.config.show_demo_credentials;
+        fresh.brand = clone(db.brand);
+        audit(fresh, s0.user, 'RESET', 'db', 'Demo data reset');
+        return transact((w) => { Object.keys(w).forEach((k) => delete w[k]); Object.assign(w, fresh); return true; });
+      }
+    });
+
+    refresh();
+    return api;
+  }
+
+  return { create, ApiError, luhnValid, luhnCheckDigit, haversineM, sha256, DB_KEY, STAGES };
+});
+
+</script>
+<script>
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory();
+  else root.StepwiseAssistant = factory();
+})(typeof self !== 'undefined' ? self : this, function () {
+  'use strict';
+
+  // Rules-based assistant. It never calls a language model. Every reply is plain
+  // text, so nothing the user types can inject markup into the page.
+
+  const EXTRA_ALIASES = {
+    'four-mile': ['4 mile', 'four mile', '4mile'],
+    lae: ['top town'],
+    madang: ['madang town'],
+    hagen: ['mt hagen', 'mount hagen', 'mt hagen town'],
+    gordons: ['gordon'],
+    kokopo: ['kokopo town']
+  };
+  const GRID_ALIASES = {
+    capital: ['port moresby', 'moresby', 'ncd', 'capital', 'pomis'],
+    highlands: ['highlands', 'momase', 'lae', 'madang', 'goroka', 'hagen', 'ramu'],
+    islands: ['islands', 'new britain', 'kokopo', 'kimbe', 'gazelle'],
+    provincial: ['provincial', 'alotau', 'wewak', 'mini grid', 'mini grids']
+  };
+
+  const POLE_RE = /\b[A-Za-z]{3}-[A-Za-z]\d{1,2}-\d{1,3}\b/;
+  const METER_RE = /\b\d{11}\b/;
+  const TICKET_RE = /\b(FLT|RPU)-\d{4,6}\b/i;
+  // Access codes are 6 characters from an unambiguous alphabet. Prefer the code after the word "code".
+  function accessCodeFrom(text, ticketId) {
+    const rest = String(text).replace(new RegExp(ticketId, 'i'), ' ');
+    const after = rest.match(/\bcode\s*(?:is|:|#)?\s*([A-Za-z2-9]{6})\b/i);
+    if (after) return after[1].toUpperCase();
+    const cands = rest.match(/\b[A-Z2-9]{6}\b/g) || [];
+    return cands.length ? cands[0] : '';
+  }
+
+  const norm = (s) => ' ' + String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim() + ' ';
+  const rx = (phrase) => new RegExp('(^|\\s)' + phrase.replace(/ /g, '\\s+') + '(s|es)?(?=\\s|$)');
+  const has = (text, phrases) => phrases.some((p) => rx(p).test(text));
+
+  const HAZARD = ['fallen wire', 'fallen line', 'fallen power line', 'low wire', 'low line', 'sparking', 'sparks', 'arcing', 'electrocut', 'electric shock', 'got shocked', 'on fire', 'fire at', 'burning transformer', 'exploded', 'explosion', 'transformer fire', 'live wire'];
+  const FRAUD = ['illegal connection', 'illegal wire', 'illegal', 'hook up', 'hookup', 'tamper', 'bypass', 'bridged', 'steal', 'stolen power', 'theft', 'free electricity', 'meter fraud'];
+  const OUTAGE = ['blackout', 'power is out', 'power out', 'no power', 'no electricity', 'outage', 'lights are off', 'without power', 'power cut'];
+  const TOKEN = ['last token', 'missing token', 'lost token', 'my token', 'token not', 'token history', 'token'];
+  const GRID = ['grid', 'load', 'power status', 'system status', 'status'];
+  const PAY = ['buy', 'pay', 'top up', 'topup', 'vend', 'ussd', 'channel', 'fee', 'fees', 'payment', 'how much', 'card'];
+  const OFFICE = ['office', 'centre', 'center', 'where', 'branch', 'hours'];
+  const NEWS = ['news', 'notice', 'notices', 'planned', 'maintenance', 'announcement'];
+  const SAFETY = ['safety', 'stay away', 'what do i do', 'what should i do', 'help'];
+  const NOISE = new Set(['report', 'reporting', 'blackout', 'power', 'out', 'is', 'no', 'there', 'please', 'the', 'a', 'an', 'at', 'near', 'in', 'on', 'pole', 'my', 'our', 'we', 'i', 'have', 'has', 'been', 'since', 'this', 'morning', 'today', 'its', 'it', 'and', 'of']);
+
+  function suburbMatch(api, text) {
+    const subs = api.getConfig().suburbs;
+    let best = null, bestLen = 0;
+    const t = norm(text);
+    for (const s of subs) {
+      const aliases = [s.name, s.id.replace(/-/g, ' ')].concat(EXTRA_ALIASES[s.id] || []);
+      for (const a of aliases) {
+        const n = norm(a).trim();
+        if (n && t.includes(' ' + n + ' ') && n.length > bestLen) { best = s; bestLen = n.length; }
+      }
+    }
+    return best;
+  }
+  function gridMatch(text) {
+    const t = norm(text);
+    for (const k of Object.keys(GRID_ALIASES)) if (GRID_ALIASES[k].some((a) => t.includes(' ' + a + ' '))) return k;
+    return null;
+  }
+  function locationText(text, pole) {
+    let s = String(text).replace(new RegExp(POLE_RE.source, 'gi'), ' ');
+    s = s.replace(/[^A-Za-z0-9 .'-]+/g, ' ').split(/\s+/).filter((w) => w && !NOISE.has(w.toLowerCase())).join(' ');
+    return s.slice(0, 120);
+  }
+  const key = () => 'ai-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+
+  function createAssistant(api) {
+    let pending = null; // { intent, slots } awaiting a missing detail
+    const brand = () => api.getBrand();
+
+    function ticketLines(t) {
+      const lines = ['Ticket ' + t.ticket_id + ' - ' + t.stage + (t.priority ? ' (' + t.priority + ')' : '')];
+      if (t.kind === 'FAULT') lines.push('Area: ' + t.suburb_name + ' · ' + t.grid_name);
+      if (t.kind === 'FAULT' && t.crew) lines.push('Crew: ' + t.crew);
+      if (t.kind === 'TIP') lines.push('Confidential report. Staff will review it.');
+      return lines;
+    }
+
+    function raiseFault(text, category, suburb, extra) {
+      const pole = (text.match(POLE_RE) || [''])[0].toUpperCase();
+      const loc = locationText(text, pole);
+      const r = api.createFault(Object.assign({
+        idempotency_key: key(), category, suburb_id: suburb.id, pole_tag: pole, address_text: loc, details: String(text).slice(0, 300)
+      }, extra || {}));
+      const t = r.ticket;
+      const lines = ticketLines(t);
+      if (r.deduplicated) lines.unshift('This matches an open report, so I attached your details to it (' + r.distance_m + ' m away).');
+      else lines.unshift('I logged a new ticket.');
+      if (r.note) lines.push(r.note);
+      if (r.nearby_area_outage) lines.push('Note: an area outage ' + r.nearby_area_outage + ' is open nearby.');
+      return { text: lines[0], lines: lines.slice(1), tool: 'create_fault_ticket', actions: [{ label: 'Track ticket', nav: 'tracker' }] };
+    }
+
+    function hazard(text, suburb) {
+      const brandNow = brand();
+      const intro = ['Stay at least 10 metres away from fallen or sparking lines.', 'Call ' + brandNow.hotline + ' now.', 'Quote the nearest pole tag if you can see one.'];
+      if (!suburb) {
+        pending = { intent: 'hazard', text };
+        return { text: 'This sounds like an electrical hazard.', lines: intro.concat(['Which suburb or town is it in? I will log it straight away.']), tool: 'emergency_safety_override', actions: [] };
+      }
+      const r = raiseFault(text, 'HAZARD', suburb);
+      return { text: 'This sounds like an electrical hazard. I have logged it as priority P1.', lines: intro.concat(r.lines), tool: 'emergency_safety_override + create_fault_ticket', actions: r.actions };
+    }
+
+    function outage(text, suburb) {
+      if (!suburb) {
+        pending = { intent: 'outage', text };
+        return { text: 'I can log that outage. Which suburb or town is it in?', lines: ['Include a pole tag like POM-A12-04 if you can see one.'], tool: null, actions: [] };
+      }
+      const r = raiseFault(text, 'AREA_BLACKOUT', suburb);
+      return { text: r.text, lines: r.lines, tool: 'create_fault_ticket', actions: r.actions };
+    }
+
+    function tokenHelp(text) {
+      const m = text.match(METER_RE);
+      if (!m) {
+        pending = { intent: 'token' };
+        return { text: 'Which 11-digit meter number is it for?', lines: [], tool: null, actions: [] };
+      }
+      try { api.lookupMeter(m[0]); } catch (e) {
+        return { text: e.message, lines: [], tool: null, actions: [] };
+      }
+      return {
+        text: 'For privacy, I do not show tokens in chat. Unlock the meter with its PIN in EasiPay to see its token history.',
+        lines: ['If your payment went through but no token arrived, check the payment status in EasiPay first.'],
+        tool: null, actions: [{ label: 'Open EasiPay', nav: 'easipay' }]
+      };
+    }
+
+    function gridReply(text) {
+      const g = gridMatch(text);
+      const grids = api.getGrid();
+      const pick = g ? grids.filter((x) => x.key === g) : grids;
+      return {
+        text: 'Current grid status:', tool: 'query_grid_telemetry', actions: [{ label: 'Open grid view', nav: 'grid' }],
+        lines: pick.map((x) => x.name + ': ' + x.status + ' (' + x.load_mw + ' MW of ' + x.capacity_mw + ' MW)' + (x.open_p1 ? ' · ' + x.open_p1 + ' P1 open' : ''))
+      };
+    }
+
+    function trackReply(text) {
+      const id = text.match(TICKET_RE)[0].toUpperCase();
+      try {
+        const t = api.trackTicket({ ticket_id: id, access_code: accessCodeFrom(text, id) });
+        return { text: ticketLines(t)[0], lines: ticketLines(t).slice(1).concat(['Latest update: ' + (t.timeline.length ? t.timeline[t.timeline.length - 1].stage : t.stage)]), tool: 'track_ticket', actions: [] };
+      } catch (e) {
+        if (id.startsWith('RPU')) return { text: 'Confidential tip-offs need their access code. Enter the code you were given with the ticket number.', lines: [], tool: null, actions: [] };
+        return { text: 'I could not find that ticket. Check the number and try again.', lines: [], tool: null, actions: [] };
+      }
+    }
+
+    function payReply() {
+      const cfg = api.getConfig();
+      return {
+        text: 'Ways to buy a token in EasiPay (fees and limits from the demo settings):', tool: 'get_payment_channels', actions: [{ label: 'Open EasiPay', nav: 'easipay' }],
+        lines: cfg.channels.map((c) => c.label + ': min K' + (c.min_toea / 100).toFixed(2) + ', max K' + (c.max_toea / 100).toFixed(2) + (c.fee_toea ? ', fee K' + (c.fee_toea / 100).toFixed(2) : '') + (c.fee_pct ? ', fee ' + (c.fee_pct * 100).toFixed(1) + '%' : ''))
+          .concat(['Tokens are issued immediately after the payment is confirmed.'])
+      };
+    }
+
+    function officeReply(text) {
+      const offices = api.listOffices();
+      const sub = suburbMatch(api, text);
+      const t = norm(text);
+      const picks = offices.filter((o) => (sub && norm(o.town).includes(' ' + sub.id.replace(/-/g, ' ') + ' ')) || (!sub && t.includes(' ' + o.region.toLowerCase().split(' ')[0] + ' ')));
+      return { text: picks.length ? 'Customer service centres:' : 'Here are all customer service centres:', lines: (picks.length ? picks : offices).map((o) => o.name + ' - ' + o.town + ' (' + o.hours + ')'), tool: 'find_office', actions: [{ label: 'Open office finder', nav: 'offices' }] };
+    }
+
+    function newsReply() {
+      const n = api.listNotices().slice(0, 3);
+      return { text: 'Latest notices:', lines: n.map((x) => x.title + ' (' + x.category + ')'), tool: 'list_notices', actions: [{ label: 'Open news', nav: 'news' }] };
+    }
+
+    function safetyReply() {
+      return {
+        text: 'Safety basics:', tool: null, actions: [{ label: 'Open safety page', nav: 'safety' }],
+        lines: ['Stay at least 10 metres from fallen lines or sparking transformers.', 'Never touch a line or a person in contact with one. Call ' + brand().hotline + '.', 'Report a blackout with the suburb and pole tag so crews find it faster.']
+      };
+    }
+
+    function fraudReply() {
+      return {
+        text: 'Illegal connections and meter tampering can be reported confidentially. I will not take the details in chat.', tool: null,
+        lines: ['Open the Fraud tab. It gives you a confidential access code to track the report later.'],
+        actions: [{ label: 'Open Fraud tab', nav: 'fraud' }]
+      };
+    }
+
+    function fallback() {
+      return {
+        text: 'I can help with these. Try one of these:', tool: null, actions: [],
+        lines: ['"Report blackout at Waigani pole POM-A12-04"', '"Fallen wire in Boroko, call urgently"', '"Status of FLT-10001"', '"Grid status in Port Moresby"', '"How do I buy a token?"', '"Which office is in Lae?"']
+      };
+    }
+
+    function continuePending(text) {
+      const p = pending;
+      if (!p) return null;
+      const sub = suburbMatch(api, text);
+      if (p.intent === 'token') {
+        pending = null; return tokenHelp(text);
+      }
+      if (!sub) return { text: 'I still need the suburb or town. For example, "Boroko" or "Lae".', lines: [], tool: null, actions: [] };
+      pending = null;
+      const full = p.text + ' ' + text;
+      return p.intent === 'hazard' ? hazard(full, sub) : outage(full, sub);
+    }
+
+    function respond(input) {
+      const text = String(input || '').slice(0, 500).trim();
+      if (!text) return { text: 'Type a question or request and I will try to help.', lines: [], tool: null, actions: [] };
+      const cont = continuePending(text);
+      if (cont) return cont;
+      const t = norm(text);
+      if (TICKET_RE.test(text) && has(t, ['status', 'track', 'where', 'update', 'check', 'ticket'])) return trackReply(text);
+      if (TICKET_RE.test(text)) return trackReply(text);
+      if (has(t, HAZARD)) return hazard(text, suburbMatch(api, text));
+      if (has(t, FRAUD)) return fraudReply();
+      if (has(t, OUTAGE) || POLE_RE.test(text)) return outage(text, suburbMatch(api, text));
+      if (has(t, TOKEN) || METER_RE.test(text)) return tokenHelp(text);
+      if (has(t, GRID) && !has(t, PAY)) return gridReply(text);
+      if (has(t, PAY)) return payReply();
+      if (has(t, OFFICE)) return officeReply(text);
+      if (has(t, NEWS)) return newsReply();
+      if (has(t, SAFETY)) return safetyReply();
+      return fallback();
+    }
+
+    return { respond, _pending: () => pending, _reset: () => { pending = null; } };
+  }
+
+  return { createAssistant, suburbMatch, gridMatch, locationText, POLE_RE, METER_RE, TICKET_RE };
+});
+
+</script>
+<script>
+(function () {
+  'use strict';
+  const E = window.StepwiseEngine, A = window.StepwiseAssistant;
+  const TZ = 'Pacific/Port_Moresby';
+  let api;
+  try {
+    api = E.create({ storage: window.localStorage });
+  } catch (e) {
+    api = E.create({ storage: null });
+  }
+  const bot = A.createAssistant(api);
+
+  // ---------- helpers (DOM is built with text nodes only, never innerHTML) ----------
+  const $ = (s) => document.querySelector(s);
+  function h(tag, attrs) {
+    const el = document.createElement(tag);
+    if (attrs) for (const k of Object.keys(attrs)) {
+      const v = attrs[k];
+      if (v === null || v === undefined || v === false) continue;
+      if (k === 'class') el.className = v;
+      else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+      else el.setAttribute(k, v === true ? '' : String(v));
+    }
+    for (const c of Array.prototype.slice.call(arguments, 2).flat(Infinity)) {
+      if (c === null || c === undefined || c === false) continue;
+      el.append(c instanceof Node ? c : document.createTextNode(String(c)));
+    }
+    return el;
+  }
+  const money = (t) => 'K' + (t / 100).toFixed(2);
+  const fmtTime = (iso) => iso ? new Intl.DateTimeFormat('en-GB', { timeZone: TZ, day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(iso)) : '';
+  const newKey = () => 'web' + Date.now().toString(36) + Math.random().toString(36).slice(2, 12);
+  function parseKina(v) {
+    const s = String(v || '').trim();
+    if (!/^\d+(\.\d{1,2})?$/.test(s)) throw new Error('Enter an amount in kina, for example 20 or 20.50.');
+    return Math.round(parseFloat(s) * 100);
+  }
+  const toastTimer = { id: null };
+  function toast(msg) {
+    const layer = $('#layer');
+    const old = layer.querySelector('.toast'); if (old) old.remove();
+    const t = h('div', { class: 'toast', role: 'status' }, msg);
+    layer.append(t);
+    clearTimeout(toastTimer.id);
+    toastTimer.id = setTimeout(() => t.remove(), 4200);
+  }
+  const errMsg = (e) => (e && e.message) ? e.message : 'Something went wrong. Please try again.';
+  function fail(e) { toast(errMsg(e)); }
+  function ledNode(led) {
+    return h('span', null, h('span', { class: 'led ' + led.state, 'aria-hidden': 'true' }), led.label);
+  }
+  function pill(text, cls) { return h('span', { class: 'pill ' + (cls || '') }, text); }
+  function prioPill(p) { return p ? pill(p, p.toLowerCase()) : null; }
+  function stageCls(t) { return t.terminal ? 'pill' : (t.priority === 'P1' ? 'pill p1' : 'pill'); }
+  function openModal(card) {
+    const layer = $('#layer');
+    const back = h('div', { class: 'modal', onclick: (ev) => { if (ev.target === back) layer.replaceChildren(); } }, card);
+    layer.replaceChildren(back);
+    const first = card.querySelector('button, input, select, textarea');
+    if (first) first.focus();
+    return () => layer.replaceChildren();
+  }
+  function table(headers, rows) {
+    return h('div', { class: 'scroll' }, h('table', null,
+      h('thead', null, h('tr', null, headers.map((x) => h('th', { scope: 'col' }, x)))),
+      h('tbody', null, rows.length ? rows : h('tr', null, h('td', { colspan: headers.length, class: 'muted' }, 'Nothing to show yet.')))));
+  }
+  function kvs(pairs) {
+    return h('div', { class: 'kv' }, pairs.map(([k, v]) => [h('div', null, k), h('div', null, v)]));
+  }
+  function field(label, control) { return h('div', null, h('label', null, label), control); }
+  function select(opts, value) {
+    return h('select', null, opts.map(([v, l]) => h('option', { value: v, selected: v === value }, l)));
+  }
+  const tokenNode = (t) => h('div', { class: 'token', 'aria-label': 'Token ' + t.split('').join(' ') }, t);
+  function breakdown(q) {
+    return kvs([
+      ['Amount', money(q.amount_toea)],
+      ['Includes GST (10%)', money(q.gst_toea)],
+      ['Energy value', money(q.energy_toea)],
+      ['Channel fee', q.fee_toea ? money(q.fee_toea) : 'None'],
+      ['You pay', money(q.total_toea)],
+      ['Units (demo rate ' + money(q.rate_toea) + '/kWh)', q.kwh + ' kWh']
+    ]);
+  }
+  function stageBar(t) {
+    const idx = t.stage_index;
+    return h('ol', { class: 'steps', style: 'list-style:none;padding:0;margin:8px 0' }, t.stages.map((s, i) =>
+      h('li', { style: 'padding-left:34px;position:relative;margin-bottom:6px;' + (i <= idx ? 'font-weight:700' : 'color:var(--muted)') },
+        h('span', { style: 'position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;text-align:center;line-height:24px;font-size:13px;background:' + (i <= idx ? 'var(--brand);color:#fff' : 'var(--line)') }, i < idx ? '✓' : String(i + 1)),
+        s)));
+  }
+
+  // ---------- state ----------
+  const auth = { meter: {}, account: null }; // unlock tokens for this browser tab only
+  let current = null; // { name, live }
+  const views = {};
+  const NAV = [
+    ['dashboard', 'Home'], ['easipay', 'EasiPay'], ['tracker', 'Faults & Tracker'], ['grid', 'Grid'], ['news', 'News'],
+    ['offices', 'Offices'], ['fraud', 'Report Tampering'], ['safety', 'Safety'], ['chat', 'Assistant'], ['staff', 'Staff']
+  ];
+
+  function go(name) {
+    if (!views[name]) name = 'dashboard';
+    if (location.hash !== '#' + name) location.hash = name;
+    else route();
+  }
+  function route() {
+    const name = (location.hash || '#dashboard').slice(1);
+    const key = views[name] ? name : 'dashboard';
+    current = { name: key, live: null };
+    document.querySelectorAll('#tabs button').forEach((b) => b.setAttribute('aria-current', b.dataset.view === key ? 'page' : 'false'));
+    const root = $('#view');
+    root.replaceChildren();
+    try {
+      views[key].render(root);
+    } catch (e) {
+      root.replaceChildren(h('div', { class: 'notice bad' }, 'This screen could not load: ' + errMsg(e)));
+      console.error(e);
+    }
+    $('#tabs').classList.remove('open');
+    $('#menuBtn').setAttribute('aria-expanded', 'false');
+    window.scrollTo(0, 0);
+  }
+  function buildNav() {
+    const tabs = $('#tabs');
+    tabs.replaceChildren(...NAV.map(([k, label]) => h('button', { type: 'button', 'data-view': k, onclick: () => go(k) }, label)));
+  }
+  function applyBrand() {
+    const b = api.getBrand();
+    $('#brandName').textContent = b.name;
+    $('#brandTag').textContent = b.tagline;
+    document.title = b.name + ' - ' + b.tagline;
+    document.documentElement.style.setProperty('--brand', b.color);
+  }
+  function updateStorageNote() {
+    const hl = api.health();
+    $('#storageNote').textContent = hl.persistent
+      ? 'Saved locally in this browser (revision ' + hl.rev + ').'
+      : 'Browser storage is blocked, so data lasts only until you reload.';
+  }
+  api.on(() => {
+    updateStorageNote();
+    applyBrand();
+    if (current && current.live) { try { current.live(); } catch (e) { console.error(e); } }
+  });
+  window.addEventListener('storage', (ev) => { if (ev.key === E.DB_KEY) api.reload(); });
+  window.addEventListener('hashchange', route);
+  $('#menuBtn').addEventListener('click', () => {
+    const open = $('#tabs').classList.toggle('open');
+    $('#menuBtn').setAttribute('aria-expanded', String(open));
+  });
+
+  // ---------- DASHBOARD ----------
+  views.dashboard = {
+    render(root) {
+      const b = api.getBrand();
+      const st = api.getStats();
+      const notices = api.listNotices().slice(0, 2);
+      const creds = api.demoCredentials();
+      root.append(
+        h('section', { class: 'hero' },
+          h('h1', { style: 'color:#fff' }, 'Welcome to ' + b.name),
+          h('p', null, 'Buy tokens, report faults, check the grid and get answers from the assistant. Every transaction runs through the simulated back end in this browser.'),
+          h('p', null, 'Hotline (demo): ' + b.hotline)),
+        h('div', { class: 'grid stats', 'aria-label': 'Quick stats' },
+          h('div', { class: 'card stat' }, h('b', null, String(st.tokens)), h('span', null, 'Tokens issued')),
+          h('div', { class: 'card stat' }, h('b', null, st.kwh.toLocaleString('en-GB') + ' kWh'), h('span', null, 'Energy vended')),
+          h('div', { class: 'card stat' }, h('b', null, String(st.open_faults)), h('span', null, 'Open fault tickets')),
+          h('div', { class: 'card stat' }, h('b', { style: st.open_p1 ? 'color:var(--bad)' : '' }, String(st.open_p1)), h('span', null, 'Open P1 hazards'))
+        ),
+        h('h2', { style: 'margin-top:20px' }, 'What do you need?'),
+        h('div', { class: 'grid' },
+          actionCard('Buy a token', 'Pay for electricity and get a token for your meter.', 'easipay'),
+          actionCard('Report a fault', 'Blackouts, low wires and poles. Get a ticket number.', 'tracker'),
+          actionCard('Report tampering', 'Confidentially report an illegal connection.', 'fraud'),
+          actionCard('Check the grid', 'Live status and load for each regional grid.', 'grid'),
+          actionCard('Ask the assistant', 'Plain-language help, tickets and grid status.', 'chat')
+        ),
+        h('h2', { style: 'margin-top:20px' }, 'Latest notices'),
+        h('div', { class: 'grid' }, notices.map((n) => h('div', { class: 'card' },
+          h('div', { class: 'muted' }, n.category + ' · ' + fmtTime(n.posted_at)),
+          h('strong', null, n.title),
+          h('p', { class: 'muted' }, n.summary),
+          h('button', { class: 'btn ghost small', type: 'button', onclick: () => go('news') }, 'All notices')))),
+        creds ? h('div', { class: 'card', style: 'margin-top:20px' },
+          h('h2', null, 'Demo test accounts'),
+          h('p', { class: 'muted' }, 'Use these to try the flows. They are fake and only work in this demo.'),
+          table(['Meter', 'Label', 'PIN'], creds.meters.map((m) => h('tr', null, h('td', { class: 'mono' }, m.meter_number), h('td', null, m.label), h('td', { class: 'mono' }, m.pin)))),
+          h('p', { class: 'muted' }, 'Postpaid account ' + creds.account.account + ', PIN ' + creds.account.pin + '.'),
+          h('p', { class: 'muted' }, 'Staff login: dispatcher / dispatch123 or supervisor / super123.')) : null
+      );
+      function actionCard(title, text, view) {
+        return h('div', { class: 'card' }, h('strong', null, title), h('p', { class: 'muted' }, text),
+          h('button', { class: 'btn small', type: 'button', onclick: () => go(view) }, 'Open'));
+      }
+    }
+  };
+
+  // ---------- EASIPAY ----------
+  views.easipay = {
+    render(root) {
+      const cfg = api.getConfig();
+      const chOpts = cfg.channels.map((c) => [c.id, c.label]);
+      const lastMeter = { v: '' };
+
+      // -- buy a token --
+      const meterIn = h('input', { id: 'ep-meter', inputmode: 'numeric', maxlength: '11', placeholder: '11-digit meter number', autocomplete: 'off' });
+      const meterInfo = h('div', { 'aria-live': 'polite' });
+      const amountIn = h('input', { id: 'ep-amount', inputmode: 'decimal', placeholder: 'e.g. 20.00' });
+      const chanIn = select(chOpts, 'wallet'); chanIn.id = 'ep-channel';
+      const quoteBox = h('div', { class: 'muted', 'aria-live': 'polite' });
+      const payBtn = h('button', { class: 'btn', type: 'button', disabled: true }, 'Pay');
+      const result = h('div', { 'aria-live': 'polite' });
+      let meter = null;
+
+      function refreshQuote() {
+        if (!meter) { quoteBox.replaceChildren(); payBtn.disabled = true; payBtn.textContent = 'Pay'; return; }
+        let amt;
+        try { amt = parseKina(amountIn.value); } catch (e) { quoteBox.textContent = ''; payBtn.disabled = true; payBtn.textContent = 'Pay'; return; }
+        try {
+          const q = api.quote({ meter_number: meter.meter_number, amount_toea: amt, channel: chanIn.value });
+          quoteBox.replaceChildren(breakdown(q));
+          payBtn.disabled = false; payBtn.textContent = 'Pay ' + money(q.total_toea);
+        } catch (e) { quoteBox.textContent = errMsg(e); payBtn.disabled = true; payBtn.textContent = 'Pay'; }
+      }
+      amountIn.addEventListener('input', refreshQuote);
+      chanIn.addEventListener('change', refreshQuote);
+
+      function checkMeter() {
+        try {
+          meter = api.lookupMeter(meterIn.value.trim());
+          lastMeter.v = meter.meter_number;
+          meterInfo.replaceChildren(kvs([
+            ['Customer', meter.holder_masked],
+            ['Tariff', meter.tariff_label + ' · ' + money(meter.rate_toea) + '/kWh'],
+            ['Feeder', meter.feeder],
+            ['Credit light', ledNode(meter.led)]
+          ]));
+          refreshQuote();
+        } catch (e) { meter = null; meterInfo.replaceChildren(); refreshQuote(); fail(e); }
+      }
+      function pay() {
+        if (!meter) return;
+        let amt;
+        try { amt = parseKina(amountIn.value); } catch (e) { return fail(e); }
+        payBtn.disabled = true;
+        let p;
+        try {
+          p = api.createPayment({ kind: 'VEND', meter_number: meter.meter_number, amount_toea: amt, channel: chanIn.value, idempotency_key: newKey() });
+        } catch (e) { fail(e); refreshQuote(); return; }
+        openGateway(p, (res) => showVendResult(res, p), () => refreshQuote());
+      }
+      function showVendResult(res, p) {
+        result.replaceChildren();
+        const pay = res.payment;
+        if (res.tx) {
+          result.append(h('div', { class: 'card', style: 'margin-top:12px' },
+            h('span', { class: 'pill ok' }, 'Token issued'),
+            h('h2', { style: 'margin-top:8px' }, 'Your token'),
+            tokenNode(res.tx.token),
+            h('p', { class: 'muted' }, 'Enter this on the meter keypad. Transaction ' + res.tx.tx_ref + ', ' + res.tx.kwh + ' kWh added.'),
+            kvs([['Meter credit light', ledNode(res.meter_led)], ['Paid', money(pay.total_toea)], ['Time', fmtTime(res.tx.created_at)]])
+          ));
+          amountIn.value = ''; refreshQuote();
+          return;
+        }
+        if (pay.status === 'PENDING') {
+          result.append(h('div', { class: 'notice warn' },
+            h('strong', null, 'Payment not confirmed yet. '), 'No token has been issued. You are not charged twice if you retry with the same payment.',
+            h('div', { class: 'row', style: 'margin-top:8px' }, h('button', { class: 'btn small', type: 'button', onclick: () => checkStatus(pay.id) }, 'Check payment status'))));
+          return;
+        }
+        result.append(h('div', { class: 'notice bad' }, h('strong', null, 'Payment ' + pay.status.toLowerCase() + '. '), pay.failure_reason || 'No token was issued.'));
+      }
+      function checkStatus(id) {
+        try {
+          const res = api.reconcilePayment(id);
+          showVendResult(res, null);
+        } catch (e) { result.replaceChildren(h('div', { class: 'notice bad' }, errMsg(e))); }
+      }
+
+      payBtn.addEventListener('click', pay);
+      meterIn.addEventListener('change', checkMeter);
+      meterIn.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') { ev.preventDefault(); checkMeter(); } });
+
+      root.append(
+        h('h1', null, 'EasiPay: buy a token'),
+        h('p', { class: 'sub' }, 'Pay for electricity with your meter number. Tokens are issued after the payment is confirmed.'),
+        h('div', { class: 'split' },
+          h('div', { class: 'card' },
+            h('h2', null, '1. Your meter'),
+            field('Meter number', meterIn),
+            h('div', { class: 'row', style: 'margin-top:10px' }, h('button', { class: 'btn ghost auto', type: 'button', onclick: checkMeter }, 'Check meter')),
+            meterInfo),
+          h('div', { class: 'card' },
+            h('h2', null, '2. Amount and payment'),
+            field('Amount (kina)', amountIn),
+            field('Payment channel', chanIn),
+            h('p', { class: 'muted' }, 'Limits and fees: ' + cfg.channels.map((c) => c.label + ' K' + (c.min_toea / 100) + '–K' + (c.max_toea / 100)).join('; ') + '.'),
+            quoteBox,
+            h('div', { class: 'row', style: 'margin-top:10px' }, payBtn))
+        ),
+        result,
+        h('div', { class: 'split', style: 'margin-top:18px' }, tokenHistorySection(), postpaidSection())
+      );
+
+      function tokenHistorySection() {
+        const num = h('input', { placeholder: 'Meter number', inputmode: 'numeric', maxlength: '11' });
+        const pin = h('input', { type: 'password', placeholder: 'Meter PIN', autocomplete: 'off', inputmode: 'numeric' });
+        const out = h('div');
+        const load = () => {
+          const token = auth.meter[num.value.trim()];
+          try {
+            const r = api.listVendHistory({ meter_number: num.value.trim(), auth_token: token });
+            out.replaceChildren(
+              h('h3', { style: 'font-size:15px' }, 'Recent tokens'),
+              table(['Time', 'Token', 'kWh', 'Paid'], r.transactions.map((t) => h('tr', null, h('td', null, fmtTime(t.created_at)), h('td', { class: 'mono' }, t.token), h('td', null, String(t.kwh)), h('td', null, money(t.amount_toea))))),
+              r.payments.length ? h('p', { class: 'muted' }, r.payments.length + ' payment(s) not yet confirmed. Check status in the payment panel above.') : null);
+          } catch (e) { out.replaceChildren(); fail(e); }
+        };
+        const unlock = () => {
+          try {
+            const s = api.verifyMeter(num.value.trim(), pin.value);
+            auth.meter[num.value.trim()] = s.auth_token;
+            pin.value = '';
+            toast('Meter unlocked for 15 minutes.');
+            load();
+          } catch (e) { fail(e); }
+        };
+        return h('div', { class: 'card' },
+          h('h2', null, 'Token history'),
+          h('p', { class: 'muted' }, 'Enter the meter PIN to see past tokens. Tokens are never shown without a PIN.'),
+          field('Meter number', num), field('Meter PIN', pin),
+          h('div', { class: 'row', style: 'margin-top:10px' },
+            h('button', { class: 'btn ghost', type: 'button', onclick: unlock }, 'Unlock and view'),
+            h('button', { class: 'btn ghost', type: 'button', onclick: load }, 'Refresh')),
+          out);
+      }
+
+      function postpaidSection() {
+        const acc = h('input', { placeholder: 'Account number' });
+        const pin = h('input', { type: 'password', placeholder: 'Account PIN', autocomplete: 'off', inputmode: 'numeric' });
+        const body = h('div');
+        function showStatement() {
+          const a = auth.account;
+          if (!a) return;
+          try {
+            const s = api.getStatement({ account: a, auth_token: auth.accountToken });
+            const amt = h('input', { inputmode: 'decimal', value: (s.total_due_toea / 100).toFixed(2) });
+            const chan = select(chOpts.filter(([id]) => id !== 'telco'), 'wallet');
+            const btn = h('button', { class: 'btn', type: 'button' }, 'Pay statement');
+            const res = h('div', { 'aria-live': 'polite' });
+            btn.addEventListener('click', () => {
+              let amount;
+              try { amount = parseKina(amt.value); } catch (e) { return fail(e); }
+              try {
+                const p = api.createPayment({ kind: 'POSTPAID', account: a, amount_toea: amount, channel: chan.value, idempotency_key: newKey(), auth_token: auth.accountToken });
+                openGateway(p, (r) => {
+                  if (r.payment.status === 'SETTLED') { res.replaceChildren(h('div', { class: 'notice ok' }, 'Payment received: ' + money(r.payment.amount_toea) + '. The statement is updated.')); showStatement(); }
+                  else if (r.payment.status === 'PENDING') res.replaceChildren(h('div', { class: 'notice warn' }, 'Payment not confirmed yet. Your balance has not changed.'));
+                  else res.replaceChildren(h('div', { class: 'notice bad' }, r.payment.failure_reason || 'Payment failed.'));
+                }, () => {});
+              } catch (e) { fail(e); }
+            });
+            body.replaceChildren(
+              h('h3', { style: 'font-size:15px' }, s.holder + ' · total due ' + money(s.total_due_toea)),
+              table(['Invoice', 'Period', 'Due date', 'Outstanding'], s.invoices.map((i) => h('tr', null, h('td', { class: 'mono' }, i.id), h('td', null, i.period), h('td', null, i.due_date), h('td', null, money(i.outstanding_toea))))),
+              s.total_due_toea > 0
+                ? h('div', { style: 'margin-top:10px' }, field('Amount to pay (kina, up to total due)', amt), field('Payment channel', chan), h('div', { class: 'row', style: 'margin-top:10px' }, btn))
+                : h('p', { class: 'notice ok' }, 'Nothing outstanding.'),
+              res);
+          } catch (e) { fail(e); }
+        }
+        const unlock = () => {
+          try {
+            const s = api.verifyAccount(acc.value.trim(), pin.value);
+            auth.account = acc.value.trim(); auth.accountToken = s.auth_token; pin.value = '';
+            showStatement();
+          } catch (e) { fail(e); }
+        };
+        return h('div', { class: 'card' },
+          h('h2', null, 'Postpaid account'),
+          h('p', { class: 'muted' }, 'For business accounts. Enter the account number and PIN to see the statement.'),
+          field('Account number', acc), field('Account PIN', pin),
+          h('div', { class: 'row', style: 'margin-top:10px' }, h('button', { class: 'btn ghost', type: 'button', onclick: unlock }, 'Unlock statement')),
+          body);
+      }
+    }
+  };
+
+  // Simulated payment provider. The outcome is chosen by the user, so every path can be tested.
+  function openGateway(p, onDone, onClose) {
+    const cfg = api.getConfig();
+    const ch = cfg.channels.find((c) => c.id === p.channel);
+    let close = () => {};
+    const act = (outcome) => {
+      try {
+        const r = api.gatewayRespond(p.id, outcome);
+        close(); onClose && onClose();
+        onDone(r, outcome);
+      } catch (e) { fail(e); }
+    };
+    const card = h('div', { class: 'card', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'gw-title' },
+      h('h2', { id: 'gw-title' }, 'Simulated payment provider'),
+      h('p', null, 'Paying ' + money(p.total_toea) + ' via ' + (ch ? ch.label : p.channel) + ' for ' + p.ref + '.'),
+      h('p', { class: 'muted' }, 'Choose what the provider returns. No money moves in this demo.'),
+      h('div', { class: 'row' },
+        h('button', { class: 'btn', type: 'button', onclick: () => act('approve') }, 'Approve'),
+        h('button', { class: 'btn bad', type: 'button', onclick: () => act('decline') }, 'Decline'),
+        h('button', { class: 'btn ghost', type: 'button', onclick: () => act('noresponse') }, 'No response')),
+      h('p', { class: 'muted', style: 'margin-top:10px' }, '"No response" leaves the payment pending, so you can test the status check.'));
+    close = openModal(card);
+  }
+
+  // ---------- FAULTS & TRACKER ----------
+  views.tracker = {
+    render(root) {
+      const cfg = api.getConfig();
+      const cats = Object.keys(cfg.fault_cats).map((k) => [k, cfg.fault_cats[k].label]);
+      const subs = cfg.suburbs.map((s) => [s.id, s.name]);
+      const catIn = select(cats, 'AREA_BLACKOUT');
+      const subIn = select(subs, 'boroko');
+      const poleIn = h('input', { placeholder: 'e.g. POM-A12-04 (optional)', autocomplete: 'off' });
+      const addrIn = h('input', { placeholder: 'Street, house, landmark', maxlength: '160' });
+      const detIn = h('textarea', { maxlength: '300', placeholder: 'What do you see or hear?' });
+      const reportOut = h('div', { 'aria-live': 'polite' });
+      const submitBtn = h('button', { class: 'btn', type: 'button' }, 'Submit report');
+
+      submitBtn.addEventListener('click', () => {
+        submitBtn.disabled = true;
+        try {
+          const r = api.createFault({ idempotency_key: newKey(), category: catIn.value, suburb_id: subIn.value, pole_tag: poleIn.value.trim(), address_text: addrIn.value.trim(), details: detIn.value.trim() });
+          const lines = [];
+          lines.push(r.deduplicated
+            ? h('p', null, 'This matches an open report, ' + r.distance_m + ' m away. Your details were added to ticket ' + r.ticket.ticket_id + '.')
+            : h('p', null, 'Your ticket number is ' + r.ticket.ticket_id + '. Keep it to track progress.'));
+          if (r.note) lines.push(h('p', { class: 'muted' }, r.note));
+          if (r.nearby_area_outage) lines.push(h('p', { class: 'muted' }, 'An area outage (' + r.nearby_area_outage + ') is open nearby.'));
+          reportOut.replaceChildren(h('div', { class: 'notice ok' }, lines));
+          poleIn.value = ''; addrIn.value = ''; detIn.value = '';
+          renderList();
+        } catch (e) { fail(e); } finally { submitBtn.disabled = false; }
+      });
+
+      // track a ticket
+      const tid = h('input', { placeholder: 'e.g. FLT-10001 or RPU-10003', autocomplete: 'off' });
+      const tcode = h('input', { placeholder: 'Access code (tip-offs only)', autocomplete: 'off' });
+      const trackOut = h('div', { 'aria-live': 'polite' });
+      function track() {
+        try {
+          const t = api.trackTicket({ ticket_id: tid.value.trim(), access_code: tcode.value.trim() });
+          const latest = t.timeline.length ? t.timeline[t.timeline.length - 1].at : t.updated_at;
+          trackOut.replaceChildren(h('div', { class: 'card', style: 'margin-top:10px' },
+            h('div', { class: 'row', style: 'justify-content:space-between' },
+              h('strong', { class: 'mono' }, t.ticket_id), h('span', null, prioPill(t.priority), ' ', pill(t.stage, t.terminal ? '' : 'ok'))),
+            kvs([
+              ['Type', t.category_label],
+              ['Area', t.suburb_name + ' · ' + t.grid_name],
+              ['Updated', fmtTime(latest)],
+              ['Crew', t.crew || 'Not yet assigned']
+            ]),
+            stageBar(t),
+            t.timeline.length ? h('ul', { class: 'timeline' }, t.timeline.map((x) => h('li', null, x.stage, ' · ', h('span', { class: 'muted' }, fmtTime(x.at))))) : null));
+        } catch (e) { trackOut.replaceChildren(); fail(e); }
+      }
+
+      // live list
+      const q = h('input', { placeholder: 'Search area, pole or ticket', 'aria-label': 'Search faults' });
+      const pf = select([['all', 'All priorities'], ['P1', 'P1 hazards'], ['P2', 'P2'], ['P3', 'P3']], 'all');
+      const listBox = h('div');
+      function renderList() {
+        const rows = api.searchFaults({ q: q.value }).filter((t) => pf.value === 'all' || t.priority === pf.value);
+        listBox.replaceChildren(table(['Ticket', 'Type', 'Area', 'Stage', 'Priority', 'Updated'],
+          rows.map((t) => h('tr', null, h('td', { class: 'mono' }, t.ticket_id), h('td', null, t.category_label), h('td', null, t.suburb_name, t.pole_tag ? h('div', { class: 'muted mono' }, t.pole_tag) : null), h('td', null, pill(t.stage, t.terminal ? '' : 'ok')), h('td', null, prioPill(t.priority)), h('td', null, fmtTime(t.updated_at))))));
+      }
+      q.addEventListener('input', renderList);
+      pf.addEventListener('change', renderList);
+      tid.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') track(); });
+
+      root.append(
+        h('h1', null, 'Faults & Tracker'),
+        h('p', { class: 'sub' }, 'Report a power problem, follow a ticket, and see what is open in the network right now.'),
+        h('div', { class: 'split' },
+          h('div', { class: 'card' },
+            h('h2', null, 'Report a fault'),
+            h('p', { class: 'muted' }, 'If someone is in danger or there is a fallen or sparking line, call the hotline now and do not wait for the form.'),
+            field('Fault type', catIn), field('Suburb or town', subIn), field('Pole tag', poleIn),
+            field('Address or landmark', addrIn), field('Details', detIn),
+            h('div', { class: 'row', style: 'margin-top:10px' }, submitBtn),
+            reportOut),
+          h('div', { class: 'card' },
+            h('h2', null, 'Track a ticket'),
+            field('Ticket number', tid), field('Access code (tip-offs only)', tcode),
+            h('div', { class: 'row', style: 'margin-top:10px' }, h('button', { class: 'btn ghost', type: 'button', onclick: track }, 'Track')),
+            trackOut)),
+        h('div', { class: 'card', style: 'margin-top:14px' },
+          h('h2', null, 'Open and recent faults'),
+          h('div', { class: 'row' }, field('Search', q), field('Priority', pf)),
+          listBox)
+      );
+      renderList();
+      current.live = renderList;
+    }
+  };
+
+  // expose internals for the other UI file
+  window.StepwiseUI = { api, bot, h, $, money, fmtTime, newKey, parseKina, toast, fail, errMsg, go, views, auth, NAV, applyBrand, buildNav, route, table, kvs, field, select, pill, prioPill, stageBar, openModal, tokenNode, ledNode, breakdown, openGateway, get current() { return current; }, setLive(fn) { if (current) current.live = fn; } };
+  buildNav();
+  applyBrand();
+  updateStorageNote();
+  if (!location.hash) location.hash = '#dashboard';
+  route();
+})();
+
+(function () {
+  'use strict';
+  const U = window.StepwiseUI;
+  const { api, bot, h, money, fmtTime, newKey, toast, fail, errMsg, go, table, kvs, field, select, pill, openModal } = U;
+
+  function statusClass(s) {
+    if (/Normal/i.test(s)) return 'ok';
+    if (/Degraded|Scheduled/i.test(s)) return 'warn';
+    return 'bad';
+  }
+
+  // ---------- GRID ----------
+  U.views.grid = {
+    render(root) {
+      const box = h('div', { class: 'grid', 'aria-live': 'polite' });
+      const note = h('p', { class: 'muted' }, 'Sample figures for the demo. Load values are simulated from the time of day and any open hazards. Status updates automatically.');
+      function draw() {
+        const grids = api.getGrid();
+        box.replaceChildren(...grids.map((g) => {
+          const pct = Math.min(100, Math.round(g.load_mw / g.capacity_mw * 100));
+          return h('div', { class: 'card' },
+            h('div', { class: 'row', style: 'justify-content:space-between' }, h('strong', null, g.name), pill(g.status, statusClass(g.status))),
+            h('p', { class: 'muted', style: 'margin:4px 0 8px' }, g.source),
+            h('div', { class: 'progress ' + (pct > 90 ? 'bad' : pct > 75 ? 'warn' : '') , role: 'img', 'aria-label': 'Load ' + pct + ' percent' }, h('i', { style: 'width:' + pct + '%' })),
+            h('p', { class: 'muted' }, g.load_mw + ' MW of ' + g.capacity_mw + ' MW · ' + g.open_faults + ' open fault(s)' + (g.open_p1 ? ' · ' + g.open_p1 + ' P1' : '')),
+            h('p', null, g.overview),
+            h('p', { class: 'muted' }, 'Specs: ' + g.specs),
+            h('ul', { style: 'margin:0;padding-left:18px' }, g.mix.map((m) => h('li', null, m.label + ': ' + m.pct + '%'))));
+        }));
+      }
+      root.append(h('h1', null, 'Grid status'), h('p', { class: 'sub' }, 'Live status of the regional grids, from the simulated control room.'), note, box);
+      draw();
+      U.setLive(draw);
+    }
+  };
+
+  // ---------- NEWS ----------
+  U.views.news = {
+    render(root) {
+      const all = api.listNotices();
+      const cats = [['all', 'All categories']].concat([...new Set(all.map((n) => n.category))].map((c) => [c, c]));
+      const cat = select(cats, 'all');
+      const list = h('div', { class: 'grid' });
+      function draw() {
+        const rows = all.filter((n) => cat.value === 'all' || n.category === cat.value);
+        list.replaceChildren(h('div', { style: 'display:contents' }, rows.length ? rows.map((n) => h('div', { class: 'card' },
+          h('div', { class: 'muted' }, n.category + ' · ' + n.region + ' · ' + fmtTime(n.posted_at)),
+          h('strong', null, n.title),
+          h('p', { class: 'muted' }, n.summary),
+          h('button', { class: 'btn ghost small', type: 'button', onclick: () => openNotice(n) }, 'Read notice'))) : h('p', { class: 'muted' }, 'No notices in this category.')));
+      }
+      cat.addEventListener('change', draw);
+      root.append(h('h1', null, 'News & public notices'), h('p', { class: 'sub' }, 'Planned outages, safety messages and company news.'),
+        h('div', { class: 'row', style: 'margin-bottom:12px' }, field('Category', cat)), list);
+      draw();
+    }
+  };
+  function openNotice(n) {
+    const close = openModal(h('div', { class: 'card', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'nt' },
+      h('div', { class: 'muted' }, n.category + ' · ' + n.region + ' · ' + fmtTime(n.posted_at)),
+      h('h2', { id: 'nt' }, n.title),
+      n.body.map((p) => h('p', null, p)),
+      h('div', { class: 'row', style: 'margin-top:12px' },
+        h('button', { class: 'btn ghost', type: 'button', onclick: () => { navigator.clipboard && navigator.clipboard.writeText(n.title + '\n\n' + n.body.join('\n\n')).then(() => toast('Notice copied.'), () => toast('Copy not available here.')); } }, 'Copy text'),
+        h('button', { class: 'btn', type: 'button', onclick: () => close() }, 'Close'))));
+  }
+
+  // ---------- OFFICES ----------
+  U.views.offices = {
+    render(root) {
+      const offices = api.listOffices();
+      const regions = [['all', 'All regions']].concat([...new Set(offices.map((o) => o.region))].map((r) => [r, r]));
+      const reg = select(regions, 'all');
+      const q = h('input', { placeholder: 'Search town or office', 'aria-label': 'Search offices' });
+      const list = h('div', { class: 'grid' });
+      function draw() {
+        const s = q.value.trim().toLowerCase();
+        const rows = offices.filter((o) => (reg.value === 'all' || o.region === reg.value) && (!s || (o.name + ' ' + o.town).toLowerCase().includes(s)));
+        list.replaceChildren(h('div', { style: 'display:contents' }, rows.length ? rows.map((o) => h('div', { class: 'card' },
+          h('strong', null, o.name), h('p', { class: 'muted' }, o.town + ' · ' + o.region),
+          h('p', null, o.address), h('p', { class: 'muted' }, 'Hours: ' + o.hours))) : h('p', { class: 'muted' }, 'No office matches that search.')));
+      }
+      reg.addEventListener('change', draw); q.addEventListener('input', draw);
+      root.append(h('h1', null, 'Office finder'), h('p', { class: 'sub' }, 'Find a customer service centre. Addresses and hours are sample values until verified.'),
+        h('div', { class: 'split', style: 'margin-bottom:12px' }, field('Region', reg), field('Search', q)), list);
+      draw();
+    }
+  };
+
+  // ---------- TAMPERING (CONFIDENTIAL TIP-OFFS) ----------
+  U.views.fraud = {
+    render(root) {
+      const cfg = api.getConfig();
+      const cat = select(Object.keys(cfg.tip_cats).map((k) => [k, cfg.tip_cats[k]]), 'HOOKUP');
+      const sub = select(cfg.suburbs.map((s) => [s.id, s.name]), 'boroko');
+      const addr = h('input', { placeholder: 'Street, house or pole nearby', maxlength: '160' });
+      const det = h('textarea', { maxlength: '300', placeholder: 'What did you see? Do not include your name.' });
+      const out = h('div', { 'aria-live': 'polite' });
+      const btn = h('button', { class: 'btn', type: 'button' }, 'Submit confidentially');
+      btn.addEventListener('click', () => {
+        btn.disabled = true;
+        try {
+          const r = api.createTip({ idempotency_key: newKey(), category: cat.value, suburb_id: sub.value, address_text: addr.value.trim(), details: det.value.trim() });
+          out.replaceChildren(h('div', { class: 'card', style: 'margin-top:12px' },
+            h('span', { class: 'pill ok' }, 'Received'),
+            h('h2', { style: 'margin-top:8px' }, 'Save your access code'),
+            h('p', null, 'Ticket ' + r.ticket_id + '. Access code:'),
+            h('div', { class: 'token' }, r.access_code),
+            h('p', { class: 'muted' }, 'Shown once. You need it with the ticket number to check progress. Staff see your report without any personal details.')));
+          addr.value = ''; det.value = '';
+        } catch (e) { fail(e); } finally { btn.disabled = false; }
+      });
+
+      const tid = h('input', { placeholder: 'Ticket number (RPU-…)', autocomplete: 'off' });
+      const code = h('input', { placeholder: 'Access code', autocomplete: 'off' });
+      const chk = h('div', { 'aria-live': 'polite' });
+      const check = () => {
+        try {
+          const t = api.trackTicket({ ticket_id: tid.value.trim(), access_code: code.value.trim() });
+          chk.replaceChildren(kvs([['Ticket', t.ticket_id], ['Stage', t.stage], ['Last update', fmtTime(t.updated_at)]]));
+        } catch (e) { chk.replaceChildren(); fail(e); }
+      };
+
+      root.append(
+        h('h1', null, 'Report power theft & meter tampering'),
+        h('p', { class: 'sub' }, 'Confidential reporting for illegal connections, bypassed or broken meters.'),
+        h('div', { class: 'notice bad' }, h('strong', null, 'Do not touch wires or meters. '), 'Reporting is confidential. If there is an immediate danger, call the hotline now.'),
+        h('div', { class: 'split', style: 'margin-top:14px' },
+          h('div', { class: 'card' }, h('h2', null, 'Submit a report'),
+            field('Type of offence', cat), field('Suburb or town', sub), field('Location', addr), field('What you saw', det),
+            h('div', { class: 'row', style: 'margin-top:10px' }, btn), out),
+          h('div', { class: 'card' }, h('h2', null, 'Check a report'),
+            field('Ticket number', tid), field('Access code', code),
+            h('div', { class: 'row', style: 'margin-top:10px' }, h('button', { class: 'btn ghost', type: 'button', onclick: check }, 'Check progress')),
+            chk)));
+    }
+  };
+
+  // ---------- SAFETY ----------
+  U.views.safety = {
+    render(root) {
+      const b = api.getBrand();
+      root.append(
+        h('h1', null, 'Safety & outage reporting'),
+        h('p', { class: 'sub' }, 'What to do when you find a fallen or sparking line, or a damaged pole.'),
+        h('div', { class: 'notice bad' }, h('strong', null, 'Emergency: '), 'stay at least 10 metres away from fallen or sparking lines and call ' + b.hotline + ' now.'),
+        h('div', { class: 'split', style: 'margin-top:14px' },
+          h('div', { class: 'card' }, h('h2', null, 'If you see a fallen or sparking line'),
+            h('ol', { class: 'steps' },
+              h('li', null, h('strong', null, 'Stay back. '), 'Keep at least 10 metres from the line, the pole and anything touching it.'),
+              h('li', null, h('strong', null, 'Warn others. '), 'Keep people, children and animals away.'),
+              h('li', null, h('strong', null, 'Call now. '), 'Call ' + b.hotline + '. Give the suburb and the nearest pole tag.'),
+              h('li', null, h('strong', null, 'Log it. '), 'Use the Faults tab so crews see it on the dispatch queue.'))),
+          h('div', { class: 'card' }, h('h2', null, 'Pole tags'),
+            h('p', null, 'Each pole has a tag such as POM-A12-04. Quoting it helps crews find the exact pole.'),
+            h('p', { class: 'muted' }, 'Do not climb poles or touch cables. Crews isolate the line before anyone approaches.'))),
+        h('div', { class: 'row', style: 'margin-top:14px' },
+          h('button', { class: 'btn', type: 'button', onclick: () => go('tracker') }, 'Report a fault now'),
+          h('button', { class: 'btn ghost', type: 'button', onclick: () => go('chat') }, 'Ask the assistant')));
+    }
+  };
+
+  // ---------- ASSISTANT ----------
+  U.views.chat = {
+    render(root) {
+      const log = h('div', { class: 'chat', role: 'log', 'aria-live': 'polite', 'aria-label': 'Conversation' });
+      const input = h('input', { placeholder: 'Ask about a blackout, a token, a ticket or the grid', 'aria-label': 'Message', maxlength: '500', autocomplete: 'off' });
+      const chips = ['Report blackout at Waigani pole POM-A12-04', 'Fallen wire in Boroko, call urgently', 'Grid status in Port Moresby', 'How do I buy a token?', 'Which office is in Lae?', 'What is my last token?'];
+      function botMsg(r) {
+        return h('div', { class: 'msg bot' },
+          r.tool ? h('span', { class: 'tool' }, 'Tool: ' + r.tool + '()') : null,
+          h('div', null, r.text),
+          r.lines && r.lines.length ? h('ul', null, r.lines.map((l) => h('li', null, l))) : null,
+          r.actions && r.actions.length ? h('div', { class: 'chips' }, r.actions.map((a) => h('button', { type: 'button', onclick: () => go(a.nav) }, a.label))) : null);
+      }
+      function ask(text) {
+        const t = String(text || '').trim();
+        if (!t) return;
+        log.append(h('div', { class: 'msg user' }, t));
+        let r;
+        try { r = bot.respond(t); } catch (e) { r = { text: 'Sorry, I could not process that. Please try again.', lines: [], tool: null, actions: [] }; }
+        log.append(botMsg(r));
+        log.scrollTop = log.scrollHeight;
+        input.value = '';
+        input.focus();
+      }
+      input.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') { ev.preventDefault(); ask(input.value); } });
+      log.append(botMsg({ text: 'Hi, I am the demo assistant. I use rules and the simulated back end, not a language model. Tokens are never shown in chat.', lines: [], tool: null, actions: [] }));
+      root.append(
+        h('h1', null, 'Assistant'),
+        h('p', { class: 'sub' }, 'Ask in plain words. Reports go to the same dispatch queue as the Faults tab.'),
+        h('div', { class: 'card' }, log,
+          h('div', { class: 'chips', 'aria-label': 'Suggested questions' }, chips.map((c) => h('button', { type: 'button', onclick: () => ask(c) }, c))),
+          h('div', { class: 'row' }, input, h('button', { class: 'auto btn', type: 'button', onclick: () => ask(input.value) }, 'Send'))));
+    }
+  };
+})();
+
+(function () {
+  'use strict';
+  const U = window.StepwiseUI;
+  const { api, h, money, fmtTime, toast, fail, errMsg, table, kvs, field, select, pill, prioPill, openModal } = U;
+  const KEY = 'sw_staff_token';
+  const store = {
+    get() { try { return sessionStorage.getItem(KEY); } catch (e) { return null; } },
+    set(v) { try { v ? sessionStorage.setItem(KEY, v) : sessionStorage.removeItem(KEY); } catch (e) { /* storage blocked */ } }
+  };
+
+  U.views.staff = {
+    render(root) {
+      let token = store.get();
+      let me = null;
+      if (token) {
+        try { me = api.whoami(token); } catch (e) { token = null; store.set(null); }
+      }
+      if (!me) return renderLogin(root);
+      renderConsole(root, token, me);
+    }
+  };
+
+  function renderLogin(root) {
+    const user = h('input', { autocomplete: 'username', placeholder: 'Username' });
+    const pass = h('input', { type: 'password', autocomplete: 'current-password', placeholder: 'Password' });
+    const demo = api.demoCredentials();
+    const doLogin = () => {
+      try {
+        const s = api.login(user.value.trim(), pass.value);
+        store.set(s.token);
+        toast('Signed in as ' + s.user + ' (' + s.role + ').');
+        U.route();
+      } catch (e) { fail(e); pass.value = ''; }
+    };
+    pass.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') doLogin(); });
+    root.append(
+      h('h1', null, 'Staff dispatch & SCADA console'),
+      h('p', { class: 'sub' }, 'For dispatchers and supervisors. Access is limited to staff accounts.'),
+      h('div', { class: 'split' },
+        h('div', { class: 'card' }, h('h2', null, 'Sign in'),
+          field('Username', user), field('Password', pass),
+          h('div', { class: 'row', style: 'margin-top:10px' }, h('button', { class: 'btn', type: 'button', onclick: doLogin }, 'Sign in'))),
+        demo ? h('div', { class: 'card' }, h('h2', null, 'Demo staff accounts'),
+          h('p', { class: 'muted' }, 'Only shown while the demo is in test mode.'),
+          table(['User', 'Password', 'Role'], demo.staff.map((s) => h('tr', null, h('td', { class: 'mono' }, s.user), h('td', { class: 'mono' }, s.password), h('td', null, s.role))))) : null));
+  }
+
+  function renderConsole(root, token, me) {
+    const sup = me.role === 'supervisor';
+    const panels = [
+      ['queue', 'Dispatch queue', () => queuePanel(token, me)],
+      ['finance', 'Payments & finance', () => financePanel(token)],
+      ['notices', 'Notices', () => noticesPanel(token, sup)],
+      ['grid', 'Grid control', () => gridPanel(token, sup)],
+      ['brand', 'Brand & settings', () => brandPanel(token, sup)],
+      ['data', 'Data & audit', () => dataPanel(token, sup)]
+    ].filter(([k]) => sup || ['queue', 'finance'].includes(k));
+    const body = h('div');
+    const nav = h('div', { class: 'row', role: 'tablist', 'aria-label': 'Console sections', style: 'margin:12px 0' });
+    function show(key) {
+      const p = panels.find((x) => x[0] === key);
+      nav.querySelectorAll('button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.k === key)));
+      body.replaceChildren();
+      const built = p[2]();
+      body.append(built.el);
+      U.setLive(built.live || null);
+    }
+    nav.append(...panels.map(([k, label]) => h('button', { type: 'button', class: 'btn small ghost', role: 'tab', 'data-k': k, onclick: () => show(k) }, label)));
+    const logout = h('button', { type: 'button', class: 'btn small bad auto', onclick: () => {
+      try { api.logout(token); } catch (e) { /* session may already be gone */ }
+      store.set(null); toast('Signed out.'); U.route();
+    } }, 'Sign out');
+    root.append(
+      h('div', { class: 'card', style: 'display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap' },
+        h('div', null, h('strong', null, me.user), ' · ', pill(me.role, 'ok'), h('div', { class: 'muted' }, 'Session ends automatically after 30 minutes of inactivity.')), logout),
+      h('h1', { style: 'margin-top:14px' }, 'Staff console'), nav, body);
+    show(panels[0][0]);
+  }
+
+  // The viewer sandbox returns false from confirm(), so confirmations are built into the page.
+  function confirmAction(question, okLabel, onOk) {
+    const close = U.openModal(h('div', { class: 'card', role: 'dialog', 'aria-modal': 'true' },
+      h('p', null, question),
+      h('div', { class: 'row', style: 'margin-top:10px' },
+        h('button', { class: 'btn bad', type: 'button', onclick: () => { close(); onOk(); } }, okLabel),
+        h('button', { class: 'btn ghost', type: 'button', onclick: () => close() }, 'Keep'))));
+  }
+
+  // ---------- queue ----------
+  function queuePanel(token, me) {
+    const kind = select([['all', 'Faults and tip-offs'], ['FAULT', 'Faults only'], ['TIP', 'Tip-offs only']], 'all');
+    const closed = h('input', { type: 'checkbox', id: 'show-closed', style: 'width:auto' });
+    const box = h('div');
+    const el = h('div', null,
+      h('div', { class: 'row', style: 'margin-bottom:10px' }, field('Show', kind), h('label', { class: 'auto', for: 'show-closed', style: 'margin-top:22px' }, closed, ' Show closed')),
+      box);
+    function draw() {
+      let rows;
+      try { rows = api.staffTickets(token, { kind: kind.value === 'all' ? undefined : kind.value, status: closed.checked ? 'all' : 'open' }); }
+      catch (e) { box.replaceChildren(); fail(e); return; }
+      box.replaceChildren(table(['Ticket', 'Type', 'Area', 'Priority', 'Stage', 'Age', 'Crew', 'Actions'],
+        rows.map((t) => h('tr', null,
+          h('td', { class: 'mono' }, t.ticket_id, t.overdue ? h('div', { class: 'pill bad' }, 'Overdue') : null),
+          h('td', null, t.category_label),
+          h('td', null, t.suburb_name, t.pole_tag ? h('div', { class: 'mono muted' }, t.pole_tag) : null, t.address_text ? h('div', { class: 'muted' }, t.address_text) : null),
+          h('td', null, t.priority ? prioPill(t.priority) : pill('Private', '')),
+          h('td', null, pill(t.stage, t.terminal ? '' : 'ok')),
+          h('td', null, t.age_min + ' min'),
+          h('td', null, t.assigned_crew || '—'),
+          h('td', null, h('div', { class: 'row' },
+            t.next_stage ? h('button', { class: 'btn small', type: 'button', onclick: () => advance(t) }, 'To ' + t.next_stage) : null,
+            t.terminal ? null : h('button', { class: 'btn small bad', type: 'button', onclick: () => cancel(t) }, 'Cancel'),
+            h('button', { class: 'btn small ghost', type: 'button', onclick: () => history(t) }, 'History'))))
+        )));
+    }
+    function advance(t) {
+      try { api.advanceTicket(token, t.ticket_id, ''); toast(t.ticket_id + ' moved on.'); }
+      catch (e) { fail(e); }
+      draw();
+    }
+    function cancel(t) {
+      const reason = h('textarea', { maxlength: '200', placeholder: 'Why is this ticket being cancelled?', 'aria-label': 'Cancellation reason' });
+      const close = U.openModal(h('div', { class: 'card', role: 'dialog', 'aria-modal': 'true' },
+        h('h2', null, 'Cancel ' + t.ticket_id + '?'),
+        field('Reason (required)', reason),
+        h('div', { class: 'row', style: 'margin-top:10px' },
+          h('button', { class: 'btn bad', type: 'button', onclick: () => {
+            try { api.cancelTicket(token, t.ticket_id, reason.value); close(); toast(t.ticket_id + ' cancelled.'); draw(); }
+            catch (e) { fail(e); }
+          } }, 'Cancel ticket'),
+          h('button', { class: 'btn ghost', type: 'button', onclick: () => close() }, 'Back'))));
+    }
+    function history(t) {
+      const cur = api.staffTickets(token, { status: 'all' }).find((x) => x.ticket_id === t.ticket_id) || t;
+      openModal(h('div', { class: 'card', role: 'dialog', 'aria-modal': 'true' },
+        h('h2', null, cur.ticket_id + ' history'),
+        h('p', { class: 'muted' }, cur.category_label + ' · ' + cur.suburb_name + (cur.grid_name ? ' · ' + cur.grid_name : '')),
+        h('ul', { class: 'timeline' }, cur.events.map((e) => h('li', null, h('strong', null, e.to || e.from || 'Event'), ' · ', h('span', { class: 'muted' }, fmtTime(e.at) + ' · ' + e.actor), e.note ? h('div', { class: 'muted' }, e.note) : null))),
+        cur.reports && cur.reports.length > 1 ? h('p', { class: 'muted' }, cur.reports.length + ' reports attached.') : null,
+        h('div', { class: 'row', style: 'margin-top:10px' }, h('button', { class: 'btn', type: 'button', onclick: () => document.querySelector('#layer').replaceChildren() }, 'Close'))));
+    }
+    kind.addEventListener('change', draw); closed.addEventListener('change', draw);
+    draw();
+    return { el, live: draw };
+  }
+
+  // ---------- finance ----------
+  function financePanel(token) {
+    const box = h('div');
+    function draw() {
+      let r, pays;
+      try { r = api.financeReport(token); pays = api.listPayments(token); }
+      catch (e) { box.replaceChildren(); return fail(e); }
+      box.replaceChildren(
+        h('div', { class: 'grid' },
+          h('div', { class: 'card stat' }, h('b', null, money(r.vend.amount_toea)), h('span', null, 'Token sales (' + r.vend.count + ')')),
+          h('div', { class: 'card stat' }, h('b', null, money(r.vend.gst_toea)), h('span', null, 'GST included in sales')),
+          h('div', { class: 'card stat' }, h('b', null, money(r.postpaid.amount_toea)), h('span', null, 'Postpaid receipts (' + r.postpaid.count + ')')),
+          h('div', { class: 'card stat' }, h('b', null, String(r.pending.count)), h('span', null, 'Pending payments · ' + r.failed.count + ' failed · ' + r.expired.count + ' expired'))),
+        r.anomalies.length
+          ? h('div', { class: 'notice bad', style: 'margin-top:14px' }, h('strong', null, 'Reconciliation: ' + r.anomalies.length + ' issue(s). '), h('ul', null, r.anomalies.map((a) => h('li', null, a))))
+          : h('div', { class: 'notice ok', style: 'margin-top:14px' }, 'Reconciliation clean: token ledger, GST split, meter credits and invoice allocations all agree.'),
+        h('h2', { style: 'margin-top:16px' }, 'Recent payments'),
+        table(['Time', 'Type', 'Reference', 'Amount', 'Fee', 'Channel', 'Status', 'Note'],
+          pays.map((p) => h('tr', null, h('td', null, fmtTime(p.created_at)), h('td', null, p.kind), h('td', { class: 'mono' }, p.ref), h('td', null, money(p.amount_toea)), h('td', null, money(p.fee_toea)), h('td', null, p.channel_label), h('td', null, pill(p.status, p.status === 'SETTLED' ? 'ok' : p.status === 'PENDING' ? 'warn' : 'bad')), h('td', { class: 'muted' }, p.failure_reason || (p.tx_ref ? p.tx_ref : ''))))));
+    }
+    draw();
+    return { el: box, live: draw };
+  }
+
+  // ---------- notices ----------
+  function noticesPanel(token, sup) {
+    if (!sup) return { el: h('p', { class: 'muted' }, 'Supervisors manage notices.') };
+    const box = h('div');
+    const cat = select([['Planned Outages', 'Planned outages'], ['Safety & Compliance', 'Safety & compliance'], ['Corporate News', 'Corporate news']], 'Planned Outages');
+    const region = h('input', { placeholder: 'Region, e.g. Capital Grid' });
+    const title = h('input', { maxlength: '120', placeholder: 'Title' });
+    const summary = h('input', { maxlength: '200', placeholder: 'One-line summary' });
+    const body = h('textarea', { maxlength: '1200', placeholder: 'Full notice text' });
+    function draw() {
+      let list;
+      try { list = api.listNotices(); } catch (e) { return box.replaceChildren(); }
+      box.replaceChildren(
+        h('h2', null, 'Post a notice'),
+        h('div', { class: 'split' }, field('Category', cat), field('Region', region)),
+        field('Title', title), field('Summary', summary), field('Body', body),
+        h('div', { class: 'row', style: 'margin-top:10px' }, h('button', { class: 'btn', type: 'button', onclick: post }, 'Publish notice')),
+        h('h2', { style: 'margin-top:18px' }, 'Current notices'),
+        table(['Posted', 'Category', 'Title', ''], list.map((n) => h('tr', null, h('td', null, fmtTime(n.posted_at)), h('td', null, n.category), h('td', null, n.title),
+          h('td', null, h('button', { class: 'btn small bad', type: 'button', onclick: () => remove(n) }, 'Delete'))))));
+    }
+    function post() {
+      try {
+        api.postNotice(token, { category: cat.value, region: region.value, title: title.value, summary: summary.value, body: body.value });
+        toast('Notice published to the public news page.');
+        title.value = ''; summary.value = ''; body.value = ''; draw();
+      } catch (e) { fail(e); }
+    }
+    function remove(n) {
+      confirmAction('Delete "' + n.title + '"?', 'Delete notice', () => {
+        try { api.deleteNotice(token, n.id); toast('Notice deleted.'); draw(); } catch (e) { fail(e); }
+      });
+    }
+    draw();
+    return { el: box, live: draw };
+  }
+
+  // ---------- grid control ----------
+  function gridPanel(token, sup) {
+    const box = h('div');
+    function draw() {
+      const grids = api.getGrid();
+      box.replaceChildren(
+        h('p', { class: 'muted' }, 'Overrides show on the public Grid page straight away. Clearing an override returns the grid to automatic status from open hazards.'),
+        table(['Grid', 'Status', 'Source', 'Load', 'Set status'], grids.map((g) => {
+          const sel = select([['', 'Automatic'], ['Scheduled Inspection', 'Scheduled inspection'], ['Feeder Load Shedding', 'Feeder load shedding']], g.source.startsWith('Control room') ? (g.status === 'Scheduled Inspection' ? 'Scheduled Inspection' : 'Feeder Load Shedding') : '');
+          const apply = h('button', { class: 'btn small', type: 'button', onclick: () => {
+            try { api.setGridOverride(token, g.key, sel.value || null); toast(g.name + ' updated.'); draw(); } catch (e) { fail(e); }
+          } }, 'Apply');
+          return h('tr', null, h('td', null, g.name), h('td', null, pill(g.status, /Normal/.test(g.status) ? 'ok' : 'warn')), h('td', { class: 'muted' }, g.source), h('td', null, g.load_mw + ' / ' + g.capacity_mw + ' MW'), h('td', null, sup ? h('div', { class: 'row' }, sel, apply) : '—'));
+        })));
+    }
+    draw();
+    return { el: box, live: draw };
+  }
+
+  // ---------- brand & settings ----------
+  function brandPanel(token, sup) {
+    const b = api.getBrand();
+    const name = h('input', { value: b.name, maxlength: '40' });
+    const tag = h('input', { value: b.tagline, maxlength: '60' });
+    const hot = h('input', { value: b.hotline, maxlength: '40' });
+    const color = h('input', { type: 'color', value: b.color, 'aria-label': 'Brand colour' });
+    const cfg = api.getConfig();
+    const creds = api.demoCredentials();
+    const showCreds = h('input', { type: 'checkbox', style: 'width:auto', id: 'showc', checked: creds !== null });
+    return { el: h('div', null,
+      h('h2', null, 'Brand'),
+      h('p', { class: 'muted' }, 'Change the name, tagline, hotline and colour shown across the portal. Use a placeholder name for client demos.'),
+      h('div', { class: 'split' }, field('Utility name', name), field('Tagline', tag)),
+      h('div', { class: 'split' }, field('Hotline (demo)', hot), field('Brand colour', color)),
+      h('div', { class: 'row', style: 'margin-top:10px' }, h('button', { class: 'btn', type: 'button', onclick: () => {
+        try { api.updateBrand(token, { name: name.value, tagline: tag.value, hotline: hot.value, color: color.value }); U.applyBrand(); toast('Brand saved.'); }
+        catch (e) { fail(e); }
+      } }, 'Save brand')),
+      h('h2', { style: 'margin-top:20px' }, 'Demo settings'),
+      h('label', { style: 'display:flex;gap:8px;align-items:center' }, showCreds, ' Show demo test accounts on the public site'),
+      h('div', { class: 'row', style: 'margin-top:8px' }, h('button', { class: 'btn ghost small', type: 'button', onclick: () => {
+        try { api.setDemoCredentialsVisible(token, showCreds.checked); toast('Saved.'); } catch (e) { fail(e); }
+      } }, 'Save setting')),
+      h('p', { class: 'muted', style: 'margin-top:12px' }, 'Tariffs: ' + Object.keys(cfg.tariffs).map((k) => cfg.tariffs[k].label + ' K' + (cfg.tariffs[k].rate_toea / 100).toFixed(2) + '/kWh').join('; ') + '. GST ' + (cfg.gst_bp / 100) + '% included in each sale. All values are sample values.'))
+    };
+  }
+
+  // ---------- data & audit (supervisor) ----------
+  function dataPanel(token, sup) {
+    if (!sup) return { el: h('p', { class: 'muted' }, 'Supervisors only.') };
+    const box = h('div');
+    const tableSel = select([['meters', 'Meters'], ['vend_transactions', 'Token ledger'], ['payments', 'Payments'], ['tickets', 'Tickets'], ['ticket_events', 'Ticket events'], ['grid', 'Grid state'], ['notices', 'Notices']], 'meters');
+    const pre = h('pre', { class: 'mono', style: 'max-height:340px;overflow:auto;background:var(--bg);padding:10px;border-radius:8px;font-size:12px;white-space:pre-wrap' });
+    function inspect() {
+      try { pre.textContent = JSON.stringify(api.inspectTable(token, tableSel.value), null, 2); }
+      catch (e) { pre.textContent = errMsg(e); }
+    }
+    function audit() {
+      try {
+        const rows = api.auditLog(token);
+        box.querySelector('#audit') && box.querySelector('#audit').replaceChildren(table(['When', 'Actor', 'Action', 'Entity', 'Detail'], rows.slice(0, 100).map((a) => h('tr', null, h('td', null, fmtTime(a.at)), h('td', null, a.actor), h('td', { class: 'mono' }, a.action), h('td', { class: 'mono' }, a.entity), h('td', null, a.detail)))));
+      } catch (e) { fail(e); }
+    }
+    // Downloads are blocked inside artifact viewers, so the export is shown as selectable text with a copy button.
+    const exportBtn = h('button', { class: 'btn ghost small', type: 'button', onclick: () => {
+      let text;
+      try { text = api.exportDb(token); } catch (e) { return fail(e); }
+      const copy = h('button', { class: 'btn small', type: 'button', onclick: () => {
+        const p = navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(text) : Promise.reject(new Error('no clipboard'));
+        p.then(() => toast('Copied to clipboard.'), () => toast('Copy is blocked here. Select the text and copy it.'));
+      } }, 'Copy JSON');
+      const close = U.openModal(h('div', { class: 'card', role: 'dialog', 'aria-modal': 'true' },
+        h('h2', null, 'Database export (JSON)'),
+        h('p', { class: 'muted' }, 'Password and PIN hashes are removed. Select the text or use Copy.'),
+        h('pre', { class: 'mono', style: 'max-height:50vh;overflow:auto;white-space:pre-wrap;font-size:11px;background:var(--bg);padding:10px;border-radius:8px' }, text),
+        h('div', { class: 'row', style: 'margin-top:10px' }, copy, h('button', { class: 'btn ghost', type: 'button', onclick: () => close() }, 'Close'))));
+    } }, 'Export database (JSON)');
+    const resetBtn = h('button', { class: 'btn bad small', type: 'button', onclick: () => {
+      confirmAction('Reset all demo data to the starting state? This clears tickets and payments.', 'Reset demo', () => {
+        try { api.resetDemo(token); toast('Demo data reset.'); } catch (e) { fail(e); }
+      });
+    } }, 'Reset demo data');
+    const el = h('div', null,
+      h('h2', null, 'Simulated database'),
+      h('p', { class: 'muted' }, 'This is the local store behind the portal. PIN and password hashes are hidden. Writes go through the same rules as the public screens.'),
+      h('div', { class: 'row' }, field('Table', tableSel), h('button', { class: 'btn ghost auto', type: 'button', onclick: inspect }, 'Inspect')),
+      pre,
+      h('h2', { style: 'margin-top:18px' }, 'Audit log'),
+      h('div', { id: 'audit' }),
+      h('h2', { style: 'margin-top:18px' }, 'Maintenance'),
+      h('div', { class: 'row' }, exportBtn, resetBtn));
+    box.append(el);
+    inspect(); audit();
+    return { el: box, live: audit };
+  }
+})();
+
+</script>
+
+
