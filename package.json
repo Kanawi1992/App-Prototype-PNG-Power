@@ -1,13 +1,18 @@
 {
-  "name": "stepwise-demo-utility-portal",
-  "version": "2.0.0",
+  "name": "stepwise-ventures-utility-portal",
+  "version": "2.1.0",
   "private": true,
-  "description": "Simulated utility customer and dispatch portal. Browser localStorage back end. Demo only.",
+  "description": "Simulated utility customer and dispatch portal by Stepwise Ventures. localStorage back end, offline-capable PWA. Demo only.",
   "scripts": {
+    "icons": "python3 scripts/make-icons.py",
     "build": "node build.js",
+    "start": "node serve.js",
+    "start:https": "HTTPS=1 node serve.js",
+    "cert": "bash scripts/make-cert.sh",
     "test:engine": "node --test tests/engine.test.js",
     "test:assistant": "node --test tests/assistant.test.js",
-    "test": "npm run build && node --test tests/engine.test.js tests/assistant.test.js",
-    "test:browser": "node tests/smoke.js"
+    "test": "node build.js && node --test tests/engine.test.js tests/assistant.test.js",
+    "test:browser": "node tests/smoke.js",
+    "test:pwa": "node tests/pwa-check.js"
   }
 }

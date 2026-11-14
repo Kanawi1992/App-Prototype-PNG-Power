@@ -3,8 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Simulated utility customer and dispatch portal demo. No real payments or dispatch.">
+<meta name="description" content="Simulated utility customer and dispatch portal demo by Stepwise Ventures. No real payments or dispatch.">
 <title>Stepwise Demo Utility Portal</title>
+<!--PWA:start-->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon-180.png">
+<meta name="theme-color" content="#1f2430">
+<!--PWA:end-->
 <style>
 /*CSS*/
 </style>
@@ -13,9 +19,12 @@
 <header class="top">
   <div class="wrap">
     <div class="bar">
-      <div>
-        <div class="brand-name" id="brandName">Demo Utility</div>
-        <div class="brand-tag" id="brandTag">Customer &amp; Dispatch Portal</div>
+      <div class="brand-lockup">
+        <img class="brand-logo" src="/*LOGO*/" width="40" height="40" alt="Stepwise Ventures logo">
+        <div>
+          <div class="brand-name" id="brandName">Stepwise Ventures</div>
+          <div class="brand-tag" id="brandTag">Utility Customer &amp; Dispatch Portal</div>
+        </div>
       </div>
       <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="tabs" type="button">Menu</button>
     </div>
@@ -34,5 +43,21 @@
 <script>
 /*UI*/
 </script>
+<!--PWA:start-->
+<script>
+// Offline support. Service workers only run on https or localhost, so this is skipped elsewhere.
+(function () {
+  try {
+    if (!('serviceWorker' in navigator)) return;
+    var host = location.hostname;
+    var secure = location.protocol === 'https:' || host === 'localhost' || host === '127.0.0.1';
+    if (!secure) return;
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').catch(function () { /* offline support is optional */ });
+    });
+  } catch (e) { /* ignore */ }
+})();
+</script>
+<!--PWA:end-->
 </body>
 </html>

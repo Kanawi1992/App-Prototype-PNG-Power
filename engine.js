@@ -569,7 +569,7 @@
       const w = {
         meta: { schema: SCHEMA_VERSION, rev: 0, created_at: now, updated_at: now },
         counters: {}, payments: [], vend_transactions: [], tickets: [], ticket_events: [], audit: [], sessions: {}, locks: {}, idem: {},
-        brand: { name: 'Demo Utility', tagline: 'Customer & Dispatch Portal', hotline: '0000 0000 (demo)', color: '#0f5f73' },
+        brand: { name: 'Stepwise Ventures', tagline: 'Utility Customer & Dispatch Portal', hotline: '0000 0000 (demo)', color: '#1f2430' },
         config: {
           gst_bp: 1000, show_demo_credentials: true, tz: TZ, channels: CHANNELS, crews: CREWS, offices: OFFICES,
           tariffs: { DOM: { label: 'Domestic (demo rate)', rate_toea: 82 }, COM: { label: 'Commercial (demo rate)', rate_toea: 108 } },
@@ -618,6 +618,8 @@
       const f2 = doCreateFault(w, { category: 'HAZARD', suburb_id: 'boroko', details: 'Low wire after storm' }, ago(1700), 'seed').ticket;
       ['x', 'x', 'x', 'x'].forEach((_, i) => { if (!isTerminal(f2)) doAdvance(w, f2, 'dispatcher', i === 3 ? 'Repaired' : '', ago(1700 - 30 * (i + 1))); });
       const tip = doCreateTip(w, { category: 'HOOKUP', suburb_id: 'gerehu', address_text: 'Behind the market, near pole POM-G2-09', details: 'Visible direct wire from the pole' }, ago(900), 'DEMO42');
+      w.config.demo_credentials.fault = { ticket_id: f1.ticket_id, note: 'Open area blackout in Waigani' };
+      w.config.demo_credentials.tip = { ticket_id: tip.ticket_id, access_code: tip.access_code, note: 'Confidential tip-off in Gerehu' };
       doAdvance(w, tip, 'supervisor', 'Assigned for review', ago(800));
       w.notices.push(
         { id: 'N1', category: 'Planned Outages', posted_at: ago(300), region: 'Capital Grid', title: 'Planned feeder maintenance: Boroko and Waigani corridors',

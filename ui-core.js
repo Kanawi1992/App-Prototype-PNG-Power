@@ -151,6 +151,34 @@
     $('#menuBtn').setAttribute('aria-expanded', String(open));
   });
 
+  // ---------- demo codes (fake; shown only while demo credentials are enabled) ----------
+  function copyBtn(text) {
+    return h('button', { class: 'btn ghost small', type: 'button', onclick: () => {
+      const p = navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(text) : Promise.reject(new Error('no clipboard'));
+      p.then(() => toast('Copied.'), () => toast('Copy is blocked here. Select the code and copy it.'));
+    } }, 'Copy');
+  }
+  function codeRow(label, value, note) {
+    return h('div', { class: 'row', style: 'align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding:8px 0' },
+      h('div', null, h('div', { class: 'muted' }, label), note ? h('div', { class: 'muted' }, note) : null),
+      h('div', { class: 'row', style: 'align-items:center;flex:0 0 auto' }, h('span', { class: 'token', style: 'font-size:16px' }, value), copyBtn(value)));
+  }
+  function demoCodesCard(c) {
+    return h('div', { class: 'card', style: 'margin-top:20px' },
+      h('h2', null, 'Demo codes'),
+      h('p', { class: 'muted' }, 'Fake codes for testing the portal. They only work in this demo.'),
+      h('h3', { style: 'font-size:15px' }, 'Meters (number and PIN)'),
+      table(['Meter', 'Customer', 'PIN'], c.meters.map((m) => h('tr', null, h('td', { class: 'mono' }, m.meter_number), h('td', null, m.label), h('td', { class: 'mono' }, m.pin)))),
+      h('h3', { style: 'font-size:15px;margin-top:14px' }, 'Postpaid account'),
+      codeRow('Account number', c.account.account, 'PIN ' + c.account.pin),
+      h('h3', { style: 'font-size:15px;margin-top:14px' }, 'Tracking'),
+      c.fault ? codeRow('Fault ticket', c.fault.ticket_id, c.fault.note) : null,
+      c.tip ? codeRow('Tip-off ticket', c.tip.ticket_id, c.tip.note) : null,
+      c.tip ? codeRow('Tip-off access code', c.tip.access_code, 'Needed with the tip-off ticket number') : null,
+      h('h3', { style: 'font-size:15px;margin-top:14px' }, 'Staff logins'),
+      table(['User', 'Password', 'Role'], c.staff.map((x) => h('tr', null, h('td', { class: 'mono' }, x.user), h('td', { class: 'mono' }, x.password), h('td', null, x.role)))));
+  }
+
   // ---------- DASHBOARD ----------
   views.dashboard = {
     render(root) {
@@ -183,12 +211,7 @@
           h('strong', null, n.title),
           h('p', { class: 'muted' }, n.summary),
           h('button', { class: 'btn ghost small', type: 'button', onclick: () => go('news') }, 'All notices')))),
-        creds ? h('div', { class: 'card', style: 'margin-top:20px' },
-          h('h2', null, 'Demo test accounts'),
-          h('p', { class: 'muted' }, 'Use these to try the flows. They are fake and only work in this demo.'),
-          table(['Meter', 'Label', 'PIN'], creds.meters.map((m) => h('tr', null, h('td', { class: 'mono' }, m.meter_number), h('td', null, m.label), h('td', { class: 'mono' }, m.pin)))),
-          h('p', { class: 'muted' }, 'Postpaid account ' + creds.account.account + ', PIN ' + creds.account.pin + '.'),
-          h('p', { class: 'muted' }, 'Staff login: dispatcher / dispatch123 or supervisor / super123.')) : null
+        creds ? demoCodesCard(creds) : null
       );
       function actionCard(title, text, view) {
         return h('div', { class: 'card' }, h('strong', null, title), h('p', { class: 'muted' }, text),
